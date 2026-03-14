@@ -1,34 +1,51 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getMockBusiness } from '@/lib/getMockBusiness';
-import BarbershopTemplate from '@/app/templates/barbershop/BarbershopTemplate';
-import RestaurantTemplate from '@/app/templates/restaurant/RestaurantTemplate';
+import { getBusiness } from '@/lib/firestore';
+import BarbershopTemplate   from '@/app/templates/barbershop/BarbershopTemplate';
+import RestaurantTemplate   from '@/app/templates/restaurant/RestaurantTemplate';
+import NailSalonTemplate    from '@/app/templates/nail_salon/NailSalonTemplate';
+import GymTemplate          from '@/app/templates/gym/GymTemplate';
+import CafeTemplate         from '@/app/templates/cafe/CafeTemplate';
+import PhotographyTemplate  from '@/app/templates/photography/PhotographyTemplate';
+import { BusinessData } from '@/lib/types';
 
 type Props = { params: { slug: string } };
 
-// ── SEO Metadata ──────────────────────────────────────────────────────────────
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const business = getMockBusiness(params.slug);
-  if (!business) {
-    return { title: 'Business Not Found — SiteForge' };
+// ── Load business: Firestore first, fallback to mock for demo slugs ──────────
+async function loadBusiness(slug: string): Promise<BusinessData | null> {
+  // Try Firestore first
+  try {
+    const live = await getBusiness(slug);
+    if (live) return live;
+  } catch {
+    // Firestore unavailable in build/dev — fall through to mock
   }
 
-  const fullDescription = `${business.tagline} ${business.description}`.slice(0, 155);
+  // Fallback: mock data for the 6 demo businesses
+  return getMockBusiness(slug);
+}
 
+// ── SEO Metadata ──────────────────────────────────────────────────────────────
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const business = await loadBusiness(params.slug);
+  if (!business) return { title: 'Business Not Found — SiteForge' };
+
+  const desc = `${business.tagline} ${business.description}`.slice(0, 155);
   return {
     title: `${business.businessName} — ${business.city}`,
-    description: fullDescription,
+    description: desc,
     openGraph: {
       title: `${business.businessName} — ${business.city}`,
-      description: fullDescription,
+      description: desc,
       images: business.coverPhotoUrl ? [{ url: business.coverPhotoUrl }] : [],
     },
   };
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────────
-export default function BusinessPage({ params }: Props) {
-  const business = getMockBusiness(params.slug);
+export default async function BusinessPage({ params }: Props) {
+  const business = await loadBusiness(params.slug);
 
   // 404
   if (!business) {
@@ -52,26 +69,27 @@ export default function BusinessPage({ params }: Props) {
   }
 
   // Route to the right template
-  if (business.category === 'barbershop') {
-    return <BarbershopTemplate business={business} />;
+  switch (business.category) {
+    case 'barbershop':   return <BarbershopTemplate  business={business} />;
+    case 'restaurant':   return <RestaurantTemplate  business={business} />;
+    case 'nail_salon':   return <NailSalonTemplate   business={business} />;
+    case 'gym':          return <GymTemplate         business={business} />;
+    case 'cafe':         return <CafeTemplate        business={business} />;
+    case 'photography':  return <PhotographyTemplate business={business} />;
+    default:
+      return (
+        <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4">
+          <div className="text-center">
+            <div className="text-6xl mb-4">🚧</div>
+            <h1 className="text-3xl font-black text-white mb-3">Template Coming Soon</h1>
+            <p className="text-white/45 mb-8">
+              The <strong>{business.category}</strong> template is being built.
+            </p>
+            <Link href="/" className="text-purple-400 hover:text-purple-300 text-sm transition-colors">
+              ← Back to SiteForge
+            </Link>
+          </div>
+        </main>
+      );
   }
-  if (business.category === 'restaurant') {
-    return <RestaurantTemplate business={business} />;
-  }
-
-  // Fallback for categories not yet built
-  return (
-    <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4">
-      <div className="text-center">
-        <div className="text-6xl mb-4">🚧</div>
-        <h1 className="text-3xl font-black text-white mb-3">Template Coming Soon</h1>
-        <p className="text-white/45 mb-8">
-          The <strong>{business.category}</strong> template is being built.
-        </p>
-        <Link href="/" className="text-purple-400 hover:text-purple-300 text-sm transition-colors">
-          ← Back to SiteForge
-        </Link>
-      </div>
-    </main>
-  );
 }

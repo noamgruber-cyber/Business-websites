@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEditorStore } from '@/lib/businessStore';
+import { saveBusiness, checkSlugAvailable } from '@/lib/firestore';
 
 const CATEGORY_LABELS: Record<string, string> = {
   barbershop:  '💈 Barbershop',
@@ -30,30 +31,65 @@ function validateSlug(slug: string): string | null {
   return null;
 }
 
+type PublishState = 'idle' | 'checking' | 'saving' | 'done' | 'error';
+
 export default function Step5_Publish() {
   const router = useRouter();
   const { businessData, updateBusinessData, setStep } = useEditorStore();
 
-  const [slugError, setSlugError] = useState<string | null>(null);
-  const [publishing, setPublishing] = useState(false);
+  const [slugError, setSlugError]     = useState<string | null>(null);
+  const [publishState, setPublishState] = useState<PublishState>('idle');
+  const [publishError, setPublishError] = useState<string | null>(null);
 
   const handleSlugChange = (value: string) => {
     const slug = generateSlug(value);
     updateBusinessData({ slug });
     setSlugError(validateSlug(slug));
+    setPublishError(null);
   };
 
   const handlePublish = async () => {
-    const error = validateSlug(businessData.slug);
-    if (error) { setSlugError(error); return; }
+    const validationErr = validateSlug(businessData.slug);
+    if (validationErr) { setSlugError(validationErr); return; }
 
-    setPublishing(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    updateBusinessData({ publishedAt: new Date().toISOString() });
-    router.push(`/b/${businessData.slug}`);
+    setPublishError(null);
+
+    try {
+      // 1 — Check slug availability
+      setPublishState('checking');
+      const available = await checkSlugAvailable(businessData.slug);
+      if (!available) {
+        setSlugError('This URL is already taken, please choose another.');
+        setPublishState('idle');
+        return;
+      }
+
+      // 2 — Save to Firestore
+      setPublishState('saving');
+      const publishedData = { ...businessData, publishedAt: new Date().toISOString() };
+      await saveBusiness(publishedData);
+      updateBusinessData({ publishedAt: publishedData.publishedAt });
+
+      // 3 — Navigate
+      setPublishState('done');
+      router.push(`/b/${businessData.slug}`);
+    } catch (err) {
+      console.error('[publish]', err);
+      setPublishError('Something went wrong. Please try again.');
+      setPublishState('error');
+    }
   };
 
-  const slugValid = !slugError && businessData.slug.length >= 3;
+  const slugValid  = !slugError && businessData.slug.length >= 3;
+  const isWorking  = publishState === 'checking' || publishState === 'saving';
+
+  const statusText: Record<PublishState, string> = {
+    idle:     '🚀 Publish My Website',
+    checking: 'Checking URL…',
+    saving:   'Publishing your website…',
+    done:     '✅ Published!',
+    error:    '🚀 Publish My Website',
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4 py-16">
@@ -67,7 +103,7 @@ export default function Step5_Publish() {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
-          Back to Contact & Hours
+          Back to Contact &amp; Hours
         </button>
 
         {/* Header */}
@@ -82,13 +118,12 @@ export default function Step5_Publish() {
           <p className="text-xs font-semibold text-white/35 uppercase tracking-widest mb-4">Summary</p>
           <div className="space-y-3">
             <Row label="Business Name" value={businessData.businessName || '—'} />
-            <Row label="Category" value={CATEGORY_LABELS[businessData.category] ?? '—'} />
-            <Row label="Services" value={`${businessData.services.length} added`} />
+            <Row label="Category"      value={CATEGORY_LABELS[businessData.category] ?? '—'} />
+            <Row label="Services"      value={`${businessData.services.length} added`} />
             <Row
               label="Photos"
               value={`${businessData.coverPhotoUrl ? 1 : 0} cover · ${businessData.galleryPhotos.filter(Boolean).length} gallery`}
             />
-
             {businessData.coverPhotoUrl && (
               <div className="flex justify-between items-center pt-1">
                 <span className="text-white/40 text-sm">Cover Preview</span>
@@ -106,9 +141,11 @@ export default function Step5_Publish() {
         {/* Slug input */}
         <div className="mb-8">
           <label className="text-sm font-medium text-white/80 block mb-2">Your Website URL</label>
-          <div className={`flex items-center bg-white/5 border rounded-xl overflow-hidden transition-colors ${
-            slugError ? 'border-red-500/50' : slugValid ? 'border-green-500/40' : 'border-white/10'
-          }`}>
+          <div
+            className={`flex items-center bg-white/5 border rounded-xl overflow-hidden transition-colors ${
+              slugError ? 'border-red-500/50' : slugValid ? 'border-green-500/40' : 'border-white/10'
+            }`}
+          >
             <span className="px-3 py-3 text-white/30 text-sm bg-white/5 border-r border-white/10 whitespace-nowrap flex-shrink-0">
               siteforge.com/b/
             </span>
@@ -133,23 +170,32 @@ export default function Step5_Publish() {
           )}
         </div>
 
+        {/* Publish error banner */}
+        {publishError && (
+          <div className="mb-5 p-4 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-between gap-3">
+            <p className="text-red-400 text-sm">{publishError}</p>
+            <button
+              onClick={handlePublish}
+              className="text-xs font-semibold text-red-400 hover:text-red-300 flex-shrink-0"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* Publish button */}
         <button
           onClick={handlePublish}
-          disabled={publishing || !slugValid}
+          disabled={isWorking || !slugValid}
           className="w-full py-4 rounded-2xl font-bold text-lg text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-xl shadow-purple-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
         >
-          {publishing ? (
-            <>
-              <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-              </svg>
-              Publishing...
-            </>
-          ) : (
-            '🚀 Publish My Website'
+          {isWorking && (
+            <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
           )}
+          {statusText[publishState]}
         </button>
 
         <p className="text-center text-white/25 text-sm mt-5">

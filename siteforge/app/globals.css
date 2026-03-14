@@ -2,14 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Google Fonts - Inter + Playfair Display */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap');
-
-/* ===== Playfair Display — used in business page templates ===== */
-.font-playfair,
-[class*="font-playfair"] {
-  font-family: 'Playfair Display', Georgia, serif;
+/* ===== Font CSS Variables ===== */
+:root {
+  --font-inter:     'Inter', system-ui, sans-serif;
+  --font-playfair:  'Playfair Display', Georgia, serif;
+  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+  --font-oswald:    'Oswald', Impact, sans-serif;
+  --font-lora:      'Lora', Georgia, serif;
+  --font-dm-sans:   'DM Sans', system-ui, sans-serif;
 }
+
+/* ===== Template font utility classes ===== */
+.font-playfair  { font-family: var(--font-playfair); }
+.font-cormorant { font-family: var(--font-cormorant); }
+.font-oswald    { font-family: var(--font-oswald); }
+.font-lora      { font-family: var(--font-lora); }
+.font-dm-sans   { font-family: var(--font-dm-sans); }
 
 /* ===== Global Base Styles ===== */
 html {

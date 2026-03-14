@@ -14,8 +14,12 @@ const config: Config = {
         "blue-brand": "#3b82f6",
       },
       fontFamily: {
-        inter: ["Inter", "sans-serif"],
-        playfair: ["var(--font-playfair)", "Georgia", "serif"],
+        inter:      ['var(--font-inter)', 'Inter', 'sans-serif'],
+        playfair:   ['var(--font-playfair)', 'Georgia', 'serif'],
+        cormorant:  ['var(--font-cormorant)', 'Georgia', 'serif'],
+        oswald:     ['var(--font-oswald)', 'Impact', 'sans-serif'],
+        lora:       ['var(--font-lora)', 'Georgia', 'serif'],
+        'dm-sans':  ['var(--font-dm-sans)', 'Inter', 'sans-serif'],
       },
       backgroundImage: {
         "gradient-brand": "linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)",
