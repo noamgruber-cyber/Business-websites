@@ -15,6 +15,7 @@ const config: Config = {
       },
       fontFamily: {
         inter: ["Inter", "sans-serif"],
+        playfair: ["var(--font-playfair)", "Georgia", "serif"],
       },
       backgroundImage: {
         "gradient-brand": "linear-gradient(135deg, #8b5cf6 0%, #3b82f6 100%)",
