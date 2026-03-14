@@ -5,66 +5,78 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { useLanguage } from "@/context/LanguageContext";
-import { t } from "@/lib/translations";
+
+/**
+ * PricingSection — Homepage teaser. Shorter cards, billing toggle,
+ * and a "See Full Pricing Details →" link that goes to /pricing.
+ */
 
 type Billing = "monthly" | "yearly";
 
-const PLANS_DATA = [
+const PLANS = [
   {
     id: "starter",
-    monthlyPrice: "₪0",
-    yearlyPrice: "₪0",
+    tier: "Starter",
+    monthlyPrice: 0,
+    yearlyPrice: 0,
+    description: "Get online for free",
+    cta: "Get Started Free",
     popular: false,
-    ctaStyle: "border border-white/20 text-white hover:border-white/40 hover:bg-white/5",
-    disabledFeatures: true,
+    variant: "outline" as const,
+    features: [
+      "1 website",
+      "SiteForge subdomain",
+      "3 template designs",
+      "Contact form",
+      "Mobile responsive",
+    ],
   },
   {
     id: "business",
-    monthlyPrice: "₪49",
-    yearlyPrice: "₪39",
+    tier: "Business",
+    monthlyPrice: 49,
+    yearlyPrice: 39,
+    description: "Everything you need to grow",
+    cta: "Start Free Trial",
     popular: true,
-    ctaStyle: "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-xl shadow-purple-500/30",
-    disabledFeatures: false,
+    variant: "gradient" as const,
+    features: [
+      "Unlimited websites",
+      "All 6 template designs",
+      "Custom domain",
+      "Remove branding",
+      "Analytics + priority support",
+    ],
   },
   {
     id: "agency",
-    monthlyPrice: "₪179",
-    yearlyPrice: "₪143",
+    tier: "Agency",
+    monthlyPrice: 179,
+    yearlyPrice: 143,
+    description: "For managing multiple clients",
+    cta: "Contact Sales",
     popular: false,
-    ctaStyle: "border border-white/20 text-white hover:border-white/40 hover:bg-white/5",
-    disabledFeatures: false,
+    variant: "outline" as const,
+    features: [
+      "Up to 20 client websites",
+      "White-label solution",
+      "Team members (up to 5)",
+      "Dedicated account manager",
+      "Phone support + SLA",
+    ],
   },
 ];
-
-function CheckIcon({ disabled = false }: { disabled?: boolean }) {
-  return (
-    <svg
-      className={`w-4 h-4 flex-shrink-0 ${disabled ? "text-white/20" : "text-purple-400"}`}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2.5}
-    >
-      {disabled ? (
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-      ) : (
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-      )}
-    </svg>
-  );
-}
 
 export default function PricingSection() {
   const { user } = useAuth();
   const router = useRouter();
-  const { lang } = useLanguage();
-  const text = t[lang];
-
   const [billing, setBilling] = useState<Billing>("monthly");
 
   const handleCta = (planId: string) => {
-    if (planId === "agency") return;
+    if (planId === "agency") {
+      router.push("/login");
+      return;
+    }
     router.push(user ? "/create" : "/login");
   };
 
@@ -76,7 +88,8 @@ export default function PricingSection() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Section Header */}
+
+        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -85,112 +98,157 @@ export default function PricingSection() {
           className="text-center mb-10"
         >
           <p className="text-sm font-semibold text-purple-400 uppercase tracking-widest mb-3">
-            {text.pricing.label}
+            Pricing
           </p>
           <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4">
-            {text.pricing.title}{" "}
-            <span className="gradient-text">{text.pricing.titleHighlight}</span>
+            Simple,{" "}
+            <span className="gradient-text">Honest Pricing</span>
           </h2>
           <p className="text-white/50 text-lg max-w-xl mx-auto">
-            {text.pricing.subtitle}
+            Start free. No hidden fees. Cancel anytime.
           </p>
         </motion.div>
 
         {/* Billing toggle */}
-        <div className="flex items-center justify-center gap-4 mb-12">
-          <span className={`text-sm font-medium transition-colors ${billing === "monthly" ? "text-white" : "text-white/40"}`}>
-            {text.pricing.monthly}
-          </span>
-          <button
-            onClick={() => setBilling(billing === "monthly" ? "yearly" : "monthly")}
-            className="relative w-14 h-7 bg-white/10 border border-white/15 rounded-full hover:bg-white/15 transition-colors"
-            aria-label="Toggle billing period"
-          >
-            <motion.div
-              layout
-              transition={{ type: "spring", stiffness: 500, damping: 35 }}
-              className={`absolute top-1 w-5 h-5 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 shadow-lg ${
-                billing === "yearly" ? "left-8" : "left-1"
+        <div className="flex justify-center mb-12">
+          <div className="inline-flex items-center gap-1 bg-white/[0.06] border border-white/10 rounded-full p-1">
+            <button
+              onClick={() => setBilling("monthly")}
+              className={`relative px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                billing === "monthly" ? "text-white" : "text-white/45 hover:text-white/70"
               }`}
-            />
-          </button>
-          <span className={`text-sm font-medium transition-colors ${billing === "yearly" ? "text-white" : "text-white/40"}`}>
-            {text.pricing.yearly}
-            <span className="ms-2 text-xs font-bold text-green-400 bg-green-400/10 px-2 py-0.5 rounded-full">
-              {text.pricing.saveLabel}
-            </span>
-          </span>
+            >
+              {billing === "monthly" && (
+                <motion.div
+                  layoutId="pricing-section-pill"
+                  className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg shadow-purple-500/30"
+                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                />
+              )}
+              <span className="relative z-10">Monthly</span>
+            </button>
+            <button
+              onClick={() => setBilling("yearly")}
+              className={`relative px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
+                billing === "yearly" ? "text-white" : "text-white/45 hover:text-white/70"
+              }`}
+            >
+              {billing === "yearly" && (
+                <motion.div
+                  layoutId="pricing-section-pill"
+                  className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg shadow-purple-500/30"
+                  transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                />
+              )}
+              <span className="relative z-10 flex items-center gap-2">
+                Yearly
+                <span className="text-xs font-bold text-green-400 bg-green-400/15 px-1.5 py-0.5 rounded-full">
+                  −20%
+                </span>
+              </span>
+            </button>
+          </div>
         </div>
 
-        {/* Pricing Cards */}
+        {/* Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-center">
-          {PLANS_DATA.map((planData, index) => {
-            const plan = text.pricing.plans[planData.id as keyof typeof text.pricing.plans];
-            const price = billing === "monthly" ? planData.monthlyPrice : planData.yearlyPrice;
+          {PLANS.map((plan, index) => {
+            const displayPrice = billing === "yearly" ? plan.yearlyPrice : plan.monthlyPrice;
+            const showStrike = billing === "yearly" && plan.yearlyPrice < plan.monthlyPrice;
 
             return (
               <motion.div
-                key={planData.id}
+                key={plan.id}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
                 transition={{ duration: 0.6, delay: index * 0.1 }}
                 className={`relative rounded-2xl p-8 flex flex-col ${
-                  planData.popular
-                    ? "bg-[#0d0d1a] border-2 border-purple-500/70 shadow-2xl shadow-purple-500/20 md:py-12 md:-my-4"
+                  plan.popular
+                    ? "bg-[#0f0f20] border-2 border-purple-500/60 shadow-2xl shadow-purple-500/20 md:scale-105 md:z-10"
                     : "glass"
                 }`}
               >
-                {planData.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center gap-1.5 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg shadow-purple-500/40">
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                    <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-bold text-white bg-gradient-to-r from-purple-600 to-blue-600 shadow-lg shadow-purple-500/40">
                       <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                      {text.pricing.mostPopular}
+                      ⭐ Most Popular
                     </span>
                   </div>
                 )}
 
-                <p className="text-white/60 text-sm font-semibold uppercase tracking-widest mb-2">
-                  {plan.tier}
-                </p>
+                {/* Plan name */}
+                <p className="text-xs font-bold text-white/50 uppercase tracking-widest mb-3">{plan.tier}</p>
 
-                {/* Animated price */}
-                <div className="flex items-end gap-1 mb-2 h-14">
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={`${planData.id}-${billing}`}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                      className={`text-5xl font-black ${planData.popular ? "gradient-text" : "text-white"}`}
-                    >
-                      {price}
-                    </motion.span>
-                  </AnimatePresence>
-                  <span className="text-white/40 text-sm pb-2">{text.pricing.perMonth}</span>
+                {/* Price */}
+                <div className="flex items-end gap-1 mb-1 h-12">
+                  {displayPrice === 0 ? (
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key="free"
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="text-4xl font-black text-white leading-none"
+                      >
+                        Free
+                      </motion.span>
+                    </AnimatePresence>
+                  ) : (
+                    <>
+                      <span className="text-white/50 text-lg pb-1">₪</span>
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={`${plan.id}-${billing}`}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.2 }}
+                          className={`text-4xl font-black leading-none ${
+                            plan.popular
+                              ? "bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent"
+                              : "text-white"
+                          }`}
+                        >
+                          {displayPrice}
+                        </motion.span>
+                      </AnimatePresence>
+                      <div className="flex flex-col pb-1 gap-0.5">
+                        {showStrike && (
+                          <span className="text-white/30 text-xs line-through leading-none">
+                            ₪{plan.monthlyPrice}
+                          </span>
+                        )}
+                        <span className="text-white/40 text-xs leading-none">/mo</span>
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                <p className="text-white/45 text-sm mb-8">{plan.description}</p>
+                <p className="text-white/40 text-xs mb-6">{plan.description}</p>
 
-                <ul className="space-y-3 mb-8 flex-1">
-                  {plan.features.map((feature: string) => (
-                    <li key={feature} className="flex items-center gap-3 text-sm text-white/80">
-                      <CheckIcon />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                  {planData.disabledFeatures && plan.disabledFeatures?.map((feature: string) => (
-                    <li key={feature} className="flex items-center gap-3 text-sm text-white/25">
-                      <CheckIcon disabled />
-                      <span>{feature}</span>
+                {/* Feature list */}
+                <ul className="space-y-2.5 mb-7 flex-1">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2.5">
+                      <svg className="w-4 h-4 flex-shrink-0 text-purple-400 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm text-white/70">{f}</span>
                     </li>
                   ))}
                 </ul>
 
+                {/* CTA */}
                 <button
-                  onClick={() => handleCta(planData.id)}
-                  className={`w-full py-3 rounded-full text-sm font-semibold transition-all duration-200 ${planData.ctaStyle}`}
+                  onClick={() => handleCta(plan.id)}
+                  className={`w-full py-3 rounded-full text-sm font-bold transition-all duration-200 ${
+                    plan.variant === "gradient"
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-xl shadow-purple-500/30"
+                      : "border border-white/20 text-white hover:border-white/40 hover:bg-white/5"
+                  }`}
                 >
                   {plan.cta}
                 </button>
@@ -199,32 +257,25 @@ export default function PricingSection() {
           })}
         </div>
 
-        {/* Money-back guarantee */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-center text-white/35 text-sm mt-10"
-        >
-          {text.pricing.guarantee}
-        </motion.p>
-
-        {/* Link to full pricing page */}
+        {/* Guarantee + full pricing link */}
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="text-center mt-4"
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="text-center mt-8 space-y-3"
         >
+          <p className="text-white/30 text-sm">
+            🔒 14-day money-back guarantee · No contracts · Cancel anytime
+          </p>
           <Link
             href="/pricing"
-            className="text-sm text-purple-400/70 hover:text-purple-400 transition-colors"
+            className="inline-flex items-center gap-1 text-sm text-purple-400/70 hover:text-purple-400 transition-colors duration-200"
           >
-            {text.pricing.seeFullPricing} →
+            See Full Pricing Details →
           </Link>
         </motion.div>
+
       </div>
     </section>
   );
