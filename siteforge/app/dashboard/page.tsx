@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { getBusinessesByUser } from '@/lib/firestore';
+import { getBusinessesByUser, deleteBusiness } from '@/lib/firestore';
 import { BusinessData } from '@/lib/types';
 import { useEditorStore } from '@/lib/businessStore';
 
@@ -31,8 +31,10 @@ export default function DashboardPage() {
   const router = useRouter();
   const { loadBusiness } = useEditorStore();
 
-  const [businesses, setBusinesses] = useState<BusinessData[]>([]);
-  const [fetching, setFetching]     = useState(true);
+  const [businesses, setBusinesses]       = useState<BusinessData[]>([]);
+  const [fetching, setFetching]           = useState(true);
+  const [deleteTarget, setDeleteTarget]   = useState<BusinessData | null>(null);
+  const [deleting, setDeleting]           = useState(false);
 
   useEffect(() => {
     if (!loading && !user) router.replace('/login?redirect=/dashboard');
@@ -54,6 +56,20 @@ export default function DashboardPage() {
   const handleEdit = (business: BusinessData) => {
     loadBusiness(business);
     router.push(`/edit/${business.id}`);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await deleteBusiness(deleteTarget.slug);
+      setBusinesses((prev) => prev.filter((b) => b.id !== deleteTarget.id));
+    } catch (err) {
+      console.error('[delete]', err);
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
   };
 
   if (loading || !user) {
@@ -136,17 +152,53 @@ export default function DashboardPage() {
                 key={b.id}
                 business={b}
                 onEdit={() => handleEdit(b)}
+                onDelete={() => setDeleteTarget(b)}
               />
             ))}
           </div>
         )}
       </main>
+
+      {/* ── Delete confirmation modal ── */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-[#111118] border border-white/10 rounded-2xl p-7 max-w-sm w-full shadow-2xl">
+            <div className="text-3xl mb-4 text-center">🗑️</div>
+            <h2 className="text-xl font-bold text-white text-center mb-2">Delete website?</h2>
+            <p className="text-white/45 text-sm text-center mb-7">
+              <strong className="text-white/70">{deleteTarget.businessName}</strong> will be permanently removed.
+              This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl border border-white/15 text-white/60 hover:text-white text-sm font-medium transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={deleting}
+                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {deleting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                {deleting ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 // ── Business card ─────────────────────────────────────────────────────────────
-function BusinessCard({ business: b, onEdit }: { business: BusinessData; onEdit: () => void }) {
+function BusinessCard({
+  business: b, onEdit, onDelete,
+}: {
+  business: BusinessData; onEdit: () => void; onDelete: () => void;
+}) {
   const publishedDate = b.publishedAt
     ? new Date(b.publishedAt).toLocaleDateString('en-US', {
         month: 'short', day: 'numeric', year: 'numeric',
@@ -216,6 +268,15 @@ function BusinessCard({ business: b, onEdit }: { business: BusinessData; onEdit:
               View Site →
             </Link>
           )}
+          <button
+            onClick={onDelete}
+            title="Delete website"
+            className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/[0.04] hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 text-white/30 hover:text-red-400 transition-all duration-200 flex-shrink-0"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>

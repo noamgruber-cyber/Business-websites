@@ -22,10 +22,10 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { label: "Features", href: "#how-it-works" },
+    { label: "Features",  href: "#how-it-works" },
     { label: "Templates", href: "#templates" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "Examples", href: "#templates" },
+    { label: "Pricing",   href: "#pricing" },
+    { label: "Examples",  href: "/examples" },
   ];
 
   return (

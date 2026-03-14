@@ -1,12 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 /**
  * HeroSection — Full-viewport hero with animated gradient orbs,
  * bold headline, CTAs, social proof, and a browser mockup preview.
  */
 export default function HeroSection() {
+  const { user } = useAuth();
+  const ctaHref = user ? '/create' : '/login';
+
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center pt-24 pb-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* ===== Animated Background Orbs ===== */}
@@ -62,18 +67,18 @@ export default function HeroSection() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
         >
-          <a
-            href="#pricing"
+          <Link
+            href={ctaHref}
             className="gradient-btn text-white font-semibold text-base px-8 py-3.5 rounded-full shadow-xl shadow-purple-500/25 w-full sm:w-auto text-center"
           >
             Get Started Free →
-          </a>
-          <a
-            href="#templates"
+          </Link>
+          <Link
+            href="/examples"
             className="inline-flex items-center justify-center text-base font-semibold px-8 py-3.5 rounded-full border border-white/20 text-white/80 hover:text-white hover:border-white/40 transition-all duration-200 w-full sm:w-auto"
           >
-            View Templates
-          </a>
+            View Examples
+          </Link>
         </motion.div>
 
         {/* Social Proof */}

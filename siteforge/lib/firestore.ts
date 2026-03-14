@@ -5,6 +5,7 @@ import {
   getDoc,
   getDocs,
   updateDoc,
+  deleteDoc,
   query,
   where,
   orderBy,
@@ -50,6 +51,12 @@ export async function checkSlugAvailable(slug: string): Promise<boolean> {
   const ref  = doc(db, COL, slug);
   const snap = await getDoc(ref);
   return !snap.exists();
+}
+
+// ── Delete a business by slug ─────────────────────────────────────────────────
+export async function deleteBusiness(slug: string): Promise<void> {
+  const ref = doc(db, COL, slug);
+  await deleteDoc(ref);
 }
 
 // ── Fetch all businesses owned by a user ─────────────────────────────────────

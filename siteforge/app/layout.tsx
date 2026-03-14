@@ -2,11 +2,28 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
 
+const DESCRIPTION =
+  'The easiest way for small businesses to get online. Create a professional website for your barbershop, restaurant, or salon in minutes. No coding required.';
+
 export const metadata: Metadata = {
-  title: 'SiteForge — Build Your Business Website in Minutes',
-  description:
-    'Create a stunning website for your local business in under 5 minutes. No coding. No designers. Just pick a template and go live instantly.',
-  keywords: ['website builder', 'local business', 'barbershop', 'restaurant', 'small business'],
+  title: 'SiteForge — Build a Website for Your Business in 5 Minutes',
+  description: DESCRIPTION,
+  keywords: [
+    'website builder', 'small business website', 'barbershop website',
+    'restaurant website', 'Israel', 'no code', 'nail salon website',
+  ],
+  openGraph: {
+    title: 'SiteForge — Your Business Deserves a Beautiful Website',
+    description: DESCRIPTION,
+    url: 'https://siteforge.vercel.app',
+    siteName: 'SiteForge',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'SiteForge',
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -1,15 +1,28 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useEditorStore } from '@/lib/businessStore';
 import { BusinessCategory, CATEGORIES } from '@/lib/types';
 
-export default function CreatePage() {
+const VALID_CATEGORIES = new Set<BusinessCategory>([
+  'barbershop', 'restaurant', 'nail_salon', 'gym', 'cafe', 'photography',
+]);
+
+function CreateForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { initBusiness } = useEditorStore();
-  const [selected, setSelected] = useState<BusinessCategory | null>(null);
+
+  const paramCategory = searchParams.get('category') as BusinessCategory | null;
+  const initialCategory = paramCategory && VALID_CATEGORIES.has(paramCategory) ? paramCategory : null;
+
+  const [selected, setSelected] = useState<BusinessCategory | null>(initialCategory);
+
+  useEffect(() => {
+    if (initialCategory) setSelected(initialCategory);
+  }, [initialCategory]);
 
   const handleContinue = () => {
     if (!selected) return;
@@ -131,5 +144,17 @@ export default function CreatePage() {
       </div>
 
     </main>
+  );
+}
+
+export default function CreatePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
+      <CreateForm />
+    </Suspense>
   );
 }

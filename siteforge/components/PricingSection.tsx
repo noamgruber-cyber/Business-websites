@@ -1,6 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 
 /**
  * PricingSection — 3-tier pricing with highlighted "Business" plan.
@@ -87,6 +89,10 @@ function CheckIcon({ disabled = false }: { disabled?: boolean }) {
 }
 
 export default function PricingSection() {
+  const { user } = useAuth();
+  const router = useRouter();
+  const handleCta = () => router.push(user ? '/create' : '/login');
+
   return (
     <section id="pricing" className="relative py-24 px-4 sm:px-6 lg:px-8">
       {/* Background accent */}
@@ -174,6 +180,7 @@ export default function PricingSection() {
 
               {/* CTA Button */}
               <button
+                onClick={handleCta}
                 className={`w-full py-3 rounded-full text-sm font-semibold transition-all duration-200 ${plan.ctaStyle}`}
               >
                 {plan.cta}
