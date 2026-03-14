@@ -1,0 +1,170 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEditorStore } from '@/lib/businessStore';
+
+const CATEGORY_LABELS: Record<string, string> = {
+  barbershop:  '💈 Barbershop',
+  restaurant:  '🍕 Restaurant',
+  nail_salon:  '💅 Nail Salon',
+  gym:         '🏋️ Gym / Fitness',
+  cafe:        '☕ Café',
+  photography: '📸 Photography',
+};
+
+function generateSlug(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function validateSlug(slug: string): string | null {
+  if (!slug) return 'Slug is required';
+  if (slug.length < 3) return 'Must be at least 3 characters';
+  if (!/^[a-z0-9-]+$/.test(slug)) return 'Only lowercase letters, numbers, and hyphens';
+  return null;
+}
+
+export default function Step5_Publish() {
+  const router = useRouter();
+  const { businessData, updateBusinessData, setStep } = useEditorStore();
+
+  const [slugError, setSlugError] = useState<string | null>(null);
+  const [publishing, setPublishing] = useState(false);
+
+  const handleSlugChange = (value: string) => {
+    const slug = generateSlug(value);
+    updateBusinessData({ slug });
+    setSlugError(validateSlug(slug));
+  };
+
+  const handlePublish = async () => {
+    const error = validateSlug(businessData.slug);
+    if (error) { setSlugError(error); return; }
+
+    setPublishing(true);
+    await new Promise((r) => setTimeout(r, 1500));
+    updateBusinessData({ publishedAt: new Date().toISOString() });
+    router.push(`/b/${businessData.slug}`);
+  };
+
+  const slugValid = !slugError && businessData.slug.length >= 3;
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4 py-16">
+      <div className="w-full max-w-lg">
+
+        {/* Back link */}
+        <button
+          onClick={() => setStep(4)}
+          className="flex items-center gap-1.5 text-white/40 hover:text-white/70 text-sm mb-10 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Contact & Hours
+        </button>
+
+        {/* Header */}
+        <div className="text-center mb-10">
+          <div className="text-6xl mb-4">🚀</div>
+          <h1 className="text-4xl font-black text-white mb-3">Ready to Go Live?</h1>
+          <p className="text-white/45 text-base">Review your details and publish your website</p>
+        </div>
+
+        {/* Summary Card */}
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mb-6">
+          <p className="text-xs font-semibold text-white/35 uppercase tracking-widest mb-4">Summary</p>
+          <div className="space-y-3">
+            <Row label="Business Name" value={businessData.businessName || '—'} />
+            <Row label="Category" value={CATEGORY_LABELS[businessData.category] ?? '—'} />
+            <Row label="Services" value={`${businessData.services.length} added`} />
+            <Row
+              label="Photos"
+              value={`${businessData.coverPhotoUrl ? 1 : 0} cover · ${businessData.galleryPhotos.filter(Boolean).length} gallery`}
+            />
+
+            {businessData.coverPhotoUrl && (
+              <div className="flex justify-between items-center pt-1">
+                <span className="text-white/40 text-sm">Cover Preview</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={businessData.coverPhotoUrl}
+                  alt="Cover"
+                  className="w-20 h-12 object-cover rounded-lg border border-white/10"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Slug input */}
+        <div className="mb-8">
+          <label className="text-sm font-medium text-white/80 block mb-2">Your Website URL</label>
+          <div className={`flex items-center bg-white/5 border rounded-xl overflow-hidden transition-colors ${
+            slugError ? 'border-red-500/50' : slugValid ? 'border-green-500/40' : 'border-white/10'
+          }`}>
+            <span className="px-3 py-3 text-white/30 text-sm bg-white/5 border-r border-white/10 whitespace-nowrap flex-shrink-0">
+              siteforge.com/b/
+            </span>
+            <input
+              type="text"
+              value={businessData.slug}
+              onChange={(e) => handleSlugChange(e.target.value)}
+              placeholder="your-business-name"
+              className="flex-1 bg-transparent px-3 py-3 text-white text-sm outline-none min-w-0"
+            />
+            {slugValid && (
+              <div className="px-3 flex-shrink-0">
+                <svg className="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            )}
+          </div>
+          {slugError && <p className="text-red-400 text-xs mt-1.5">{slugError}</p>}
+          {!slugError && businessData.slug && (
+            <p className="text-white/25 text-xs mt-1.5">siteforge.com/b/{businessData.slug}</p>
+          )}
+        </div>
+
+        {/* Publish button */}
+        <button
+          onClick={handlePublish}
+          disabled={publishing || !slugValid}
+          className="w-full py-4 rounded-2xl font-bold text-lg text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-xl shadow-purple-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+        >
+          {publishing ? (
+            <>
+              <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Publishing...
+            </>
+          ) : (
+            '🚀 Publish My Website'
+          )}
+        </button>
+
+        <p className="text-center text-white/25 text-sm mt-5">
+          You can always edit your website later from your dashboard
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between items-center">
+      <span className="text-white/40 text-sm">{label}</span>
+      <span className="text-white font-medium text-sm">{value}</span>
+    </div>
+  );
+}
