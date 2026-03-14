@@ -26,10 +26,11 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { label: text.features,  href: "/#how-it-works" },
-    { label: text.templates, href: "/#templates" },
-    { label: text.pricing,   href: "/pricing" },
-    { label: text.examples,  href: "/examples" },
+    { label: text.features,   href: "/#how-it-works" },
+    { label: text.howItWorks, href: "/how-it-works" },
+    { label: text.templates,  href: "/#templates" },
+    { label: text.pricing,    href: "/pricing" },
+    { label: text.blog,       href: "/blog" },
   ];
 
   const mobileItemVariants = {

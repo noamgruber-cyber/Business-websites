@@ -7,15 +7,17 @@ export const t = {
   he: {
     // ── Navbar ──────────────────────────────────────────────────────────────
     nav: {
-      features:  'תכונות',
-      templates: 'תבניות',
-      pricing:   'מחירים',
-      examples:  'דוגמאות',
-      cta:       'צור אתר עכשיו ←',
-      dashboard: 'הדשבורד שלי ←',
-      signIn:    'התחברות ←',
-      signOut:   'התנתק',
-      langToggle: '🇺🇸 EN',
+      features:    'תכונות',
+      howItWorks:  'איך זה עובד',
+      templates:   'תבניות',
+      pricing:     'מחירים',
+      examples:    'דוגמאות',
+      blog:        'בלוג',
+      cta:         'צור אתר עכשיו ←',
+      dashboard:   'הדשבורד שלי ←',
+      signIn:      'התחברות ←',
+      signOut:     'התנתק',
+      langToggle:  '🇺🇸 EN',
     },
 
     // ── Hero ─────────────────────────────────────────────────────────────────
@@ -155,19 +157,40 @@ export const t = {
       columns: [
         {
           heading: 'מוצר',
-          links: ['תכונות', 'תבניות', 'מחירים', 'עדכונים'],
+          links: [
+            { label: 'תכונות', href: '/#how-it-works' },
+            { label: 'איך זה עובד', href: '/how-it-works' },
+            { label: 'תבניות', href: '/#templates' },
+            { label: 'מחירים', href: '/pricing' },
+            { label: 'בלוג', href: '/blog' },
+          ],
         },
         {
           heading: 'חברה',
-          links: ['אודות', 'בלוג', 'קריירה', 'צור קשר'],
+          links: [
+            { label: 'דוגמאות', href: '/examples' },
+            { label: 'בלוג', href: '/blog' },
+            { label: 'קריירה', href: '#' },
+            { label: 'צור קשר', href: '#' },
+          ],
         },
         {
           heading: 'משפטי',
-          links: ['מדיניות פרטיות', 'תנאי שימוש', 'מדיניות עוגיות', 'GDPR'],
+          links: [
+            { label: 'מדיניות פרטיות', href: '#' },
+            { label: 'תנאי שימוש', href: '#' },
+            { label: 'מדיניות עוגיות', href: '#' },
+            { label: 'GDPR', href: '#' },
+          ],
         },
         {
           heading: 'רשתות חברתיות',
-          links: ['Twitter / X', 'Instagram', 'LinkedIn', 'Facebook'],
+          links: [
+            { label: 'Twitter / X', href: '#' },
+            { label: 'Instagram', href: '#' },
+            { label: 'LinkedIn', href: '#' },
+            { label: 'Facebook', href: '#' },
+          ],
         },
       ],
     },
@@ -253,14 +276,16 @@ export const t = {
   en: {
     // ── Navbar ──────────────────────────────────────────────────────────────
     nav: {
-      features:  'Features',
-      templates: 'Templates',
-      pricing:   'Pricing',
-      examples:  'Examples',
-      cta:       'Get Started →',
-      dashboard: 'My Dashboard →',
-      signIn:    'Sign In →',
-      signOut:   'Sign out',
+      features:   'Features',
+      howItWorks: 'How It Works',
+      templates:  'Templates',
+      pricing:    'Pricing',
+      examples:   'Examples',
+      blog:       'Blog',
+      cta:        'Get Started →',
+      dashboard:  'My Dashboard →',
+      signIn:     'Sign In →',
+      signOut:    'Sign out',
       langToggle: '🇮🇱 עב',
     },
 
@@ -401,19 +426,40 @@ export const t = {
       columns: [
         {
           heading: 'Product',
-          links: ['Features', 'Templates', 'Pricing', 'Changelog'],
+          links: [
+            { label: 'Features', href: '/#how-it-works' },
+            { label: 'How It Works', href: '/how-it-works' },
+            { label: 'Templates', href: '/#templates' },
+            { label: 'Pricing', href: '/pricing' },
+            { label: 'Blog', href: '/blog' },
+          ],
         },
         {
           heading: 'Company',
-          links: ['About', 'Blog', 'Careers', 'Contact'],
+          links: [
+            { label: 'Examples', href: '/examples' },
+            { label: 'Blog', href: '/blog' },
+            { label: 'Careers', href: '#' },
+            { label: 'Contact', href: '#' },
+          ],
         },
         {
           heading: 'Legal',
-          links: ['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR'],
+          links: [
+            { label: 'Privacy Policy', href: '#' },
+            { label: 'Terms of Service', href: '#' },
+            { label: 'Cookie Policy', href: '#' },
+            { label: 'GDPR', href: '#' },
+          ],
         },
         {
           heading: 'Social',
-          links: ['Twitter / X', 'Instagram', 'LinkedIn', 'Facebook'],
+          links: [
+            { label: 'Twitter / X', href: '#' },
+            { label: 'Instagram', href: '#' },
+            { label: 'LinkedIn', href: '#' },
+            { label: 'Facebook', href: '#' },
+          ],
         },
       ],
     },

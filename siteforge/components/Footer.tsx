@@ -62,12 +62,12 @@ export default function Footer() {
                 <h4 className="text-white font-semibold text-sm mb-4">{col.heading}</h4>
                 <ul className="space-y-2.5">
                   {col.links.map((link) => (
-                    <li key={link}>
+                    <li key={link.label}>
                       <a
-                        href="#"
+                        href={link.href}
                         className="text-white/45 text-sm hover:text-white/80 transition-colors duration-200"
                       >
-                        {link}
+                        {link.label}
                       </a>
                     </li>
                   ))}
