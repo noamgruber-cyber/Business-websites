@@ -7,6 +7,10 @@ import { useAuth } from '@/context/AuthContext';
 import { getBusinessesByUser, deleteBusiness } from '@/lib/firestore';
 import { BusinessData } from '@/lib/types';
 import { useEditorStore } from '@/lib/businessStore';
+import { useLanguage } from '@/context/LanguageContext';
+import { t, type Translations } from '@/lib/translations';
+
+type DashboardText = Translations['en']['dashboard'] | Translations['he']['dashboard'];
 
 const CATEGORY_EMOJI: Record<string, string> = {
   barbershop:  '💈',
@@ -17,19 +21,12 @@ const CATEGORY_EMOJI: Record<string, string> = {
   photography: '📸',
 };
 
-const CATEGORY_LABEL: Record<string, string> = {
-  barbershop:  'Barbershop',
-  restaurant:  'Restaurant',
-  nail_salon:  'Nail Salon',
-  gym:         'Gym / Fitness',
-  cafe:        'Café',
-  photography: 'Photography',
-};
-
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const { loadBusiness } = useEditorStore();
+  const { lang } = useLanguage();
+  const text = t[lang].dashboard;
 
   const [businesses, setBusinesses]       = useState<BusinessData[]>([]);
   const [fetching, setFetching]           = useState(true);
@@ -107,7 +104,7 @@ export default function DashboardPage() {
               onClick={handleSignOut}
               className="text-xs text-white/40 hover:text-white/70 transition-colors border border-white/10 hover:border-white/20 px-3 py-1.5 rounded-lg"
             >
-              Sign out
+              {text.signOut}
             </button>
           </div>
         </div>
@@ -118,13 +115,13 @@ export default function DashboardPage() {
         {/* ── Page title + new button ── */}
         <div className="flex items-start justify-between gap-4 mb-10">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-1">Your Websites</h1>
+            <h1 className="text-3xl sm:text-4xl font-black text-white mb-1">{text.title}</h1>
             <p className="text-white/40 text-sm">
               {fetching
-                ? 'Loading…'
+                ? text.loading
                 : businesses.length === 0
-                ? 'No websites yet — create your first one!'
-                : `${businesses.length} website${businesses.length > 1 ? 's' : ''} published`}
+                ? text.empty
+                : `${businesses.length} ${businesses.length > 1 ? text.published : text.publishedSingle}`}
             </p>
           </div>
           <Link
@@ -134,7 +131,7 @@ export default function DashboardPage() {
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
             </svg>
-            New Website
+            {text.newWebsite}
           </Link>
         </div>
 
@@ -144,13 +141,14 @@ export default function DashboardPage() {
             <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : businesses.length === 0 ? (
-          <EmptyState />
+          <EmptyState text={text} />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {businesses.map((b) => (
               <BusinessCard
                 key={b.id}
                 business={b}
+                text={text}
                 onEdit={() => handleEdit(b)}
                 onDelete={() => setDeleteTarget(b)}
               />
@@ -164,10 +162,10 @@ export default function DashboardPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-[#111118] border border-white/10 rounded-2xl p-7 max-w-sm w-full shadow-2xl">
             <div className="text-3xl mb-4 text-center">🗑️</div>
-            <h2 className="text-xl font-bold text-white text-center mb-2">Delete website?</h2>
+            <h2 className="text-xl font-bold text-white text-center mb-2">{text.deleteTitle}</h2>
             <p className="text-white/45 text-sm text-center mb-7">
-              <strong className="text-white/70">{deleteTarget.businessName}</strong> will be permanently removed.
-              This cannot be undone.
+              <strong className="text-white/70">{deleteTarget.businessName}</strong>{' '}
+              {text.deleteBody}
             </p>
             <div className="flex gap-3">
               <button
@@ -175,7 +173,7 @@ export default function DashboardPage() {
                 disabled={deleting}
                 className="flex-1 py-2.5 rounded-xl border border-white/15 text-white/60 hover:text-white text-sm font-medium transition-colors disabled:opacity-50"
               >
-                Cancel
+                {text.cancelBtn}
               </button>
               <button
                 onClick={handleDeleteConfirm}
@@ -183,7 +181,7 @@ export default function DashboardPage() {
                 className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {deleting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                {deleting ? 'Deleting…' : 'Delete'}
+                {deleting ? text.deletingBtn : text.deleteBtn}
               </button>
             </div>
           </div>
@@ -195,15 +193,23 @@ export default function DashboardPage() {
 
 // ── Business card ─────────────────────────────────────────────────────────────
 function BusinessCard({
-  business: b, onEdit, onDelete,
+  business: b, text, onEdit, onDelete,
 }: {
-  business: BusinessData; onEdit: () => void; onDelete: () => void;
+  business: BusinessData;
+  text: DashboardText;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
+  const { lang } = useLanguage();
+  const catText = t[lang].create.categories;
+
   const publishedDate = b.publishedAt
-    ? new Date(b.publishedAt).toLocaleDateString('en-US', {
+    ? new Date(b.publishedAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', {
         month: 'short', day: 'numeric', year: 'numeric',
       })
     : null;
+
+  const categoryLabel = catText[b.category as keyof typeof catText]?.name ?? b.category;
 
   return (
     <div className="group bg-white/[0.04] border border-white/10 hover:border-purple-500/40 rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-lg hover:shadow-purple-500/10 flex flex-col">
@@ -224,14 +230,14 @@ function BusinessCard({
         )}
 
         {/* Status badge */}
-        <div className="absolute top-3 right-3">
+        <div className="absolute top-3 end-3">
           {b.publishedAt ? (
             <span className="bg-green-500/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-              Live
+              {text.liveLabel}
             </span>
           ) : (
             <span className="bg-yellow-500/80 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-              Draft
+              {text.draftLabel}
             </span>
           )}
         </div>
@@ -243,12 +249,12 @@ function BusinessCard({
           <h3 className="text-white font-bold text-lg leading-tight">{b.businessName || 'Untitled'}</h3>
           <span className="text-xl flex-shrink-0 mt-0.5">{CATEGORY_EMOJI[b.category]}</span>
         </div>
-        <p className="text-white/40 text-xs mb-1">{CATEGORY_LABEL[b.category]}</p>
+        <p className="text-white/40 text-xs mb-1">{categoryLabel}</p>
         {b.slug && (
           <p className="text-purple-400/70 text-xs truncate mb-1">siteforge.com/b/{b.slug}</p>
         )}
         {publishedDate && (
-          <p className="text-white/25 text-xs mb-0">Published {publishedDate}</p>
+          <p className="text-white/25 text-xs mb-0">{text.publishedOn} {publishedDate}</p>
         )}
 
         {/* Actions */}
@@ -257,7 +263,7 @@ function BusinessCard({
             onClick={onEdit}
             className="flex-1 py-2 rounded-xl bg-white/[0.06] hover:bg-white/10 text-white/70 hover:text-white text-sm font-medium transition-all duration-200 border border-white/10"
           >
-            Edit
+            {text.editBtn}
           </button>
           {b.slug && b.publishedAt && (
             <Link
@@ -265,7 +271,7 @@ function BusinessCard({
               target="_blank"
               className="flex-1 py-2 rounded-xl bg-gradient-to-r from-purple-600/80 to-blue-600/80 hover:from-purple-600 hover:to-blue-600 text-white text-sm font-medium transition-all duration-200 text-center"
             >
-              View Site →
+              {text.viewBtn}
             </Link>
           )}
           <button
@@ -284,19 +290,19 @@ function BusinessCard({
 }
 
 // ── Empty state ───────────────────────────────────────────────────────────────
-function EmptyState() {
+function EmptyState({ text }: { text: DashboardText }) {
   return (
     <div className="text-center py-24">
       <div className="text-7xl mb-5">🏗️</div>
-      <h2 className="text-2xl font-bold text-white mb-3">Build your first website</h2>
+      <h2 className="text-2xl font-bold text-white mb-3">{text.emptyTitle}</h2>
       <p className="text-white/40 text-base mb-8 max-w-sm mx-auto leading-relaxed">
-        Choose a template, fill in your business details, and go live in minutes.
+        {text.emptyDesc}
       </p>
       <Link
         href="/create"
         className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-bold text-base shadow-xl shadow-purple-500/30 transition-all duration-200 hover:scale-[1.02]"
       >
-        ⚡ Create My Website
+        {text.emptyCreate}
       </Link>
     </div>
   );

@@ -4,12 +4,16 @@ import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
+import { t } from '@/lib/translations';
 
 function LoginForm() {
   const { user, loading, signInWithGoogle } = useAuth();
   const router       = useRouter();
   const searchParams = useSearchParams();
   const redirect     = searchParams.get('redirect') || '/dashboard';
+  const { lang } = useLanguage();
+  const text = t[lang].login;
 
   const [signingIn, setSigningIn] = useState(false);
   const [error, setError]         = useState<string | null>(null);
@@ -25,7 +29,7 @@ function LoginForm() {
       await signInWithGoogle();
       router.replace(redirect);
     } catch {
-      setError('Sign in failed. Please try again.');
+      setError(text.error);
     } finally {
       setSigningIn(false);
     }
@@ -55,8 +59,8 @@ function LoginForm() {
               <span className="gradient-text">SiteForge</span>
             </span>
           </Link>
-          <h1 className="text-3xl font-black text-white mb-3">Welcome back</h1>
-          <p className="text-white/45 text-base">Sign in to manage your business websites</p>
+          <h1 className="text-3xl font-black text-white mb-3">{text.title}</h1>
+          <p className="text-white/45 text-base">{text.subtitle}</p>
         </div>
 
         {/* Card */}
@@ -77,18 +81,18 @@ function LoginForm() {
             ) : (
               <GoogleIcon />
             )}
-            {signingIn ? 'Signing in…' : 'Continue with Google'}
+            {signingIn ? text.signingIn : text.googleBtn}
           </button>
 
           <p className="text-center text-white/25 text-xs mt-6 leading-relaxed">
-            By signing in, you agree to our Terms of Service and Privacy Policy.
+            {text.terms}
           </p>
         </div>
 
         <p className="text-center text-white/35 text-sm mt-6">
-          Don&apos;t have a website yet?{' '}
+          {text.noWebsite}{' '}
           <Link href="/create" className="text-purple-400 hover:text-purple-300 font-medium">
-            Create one free
+            {text.createFree}
           </Link>
         </p>
       </div>

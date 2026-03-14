@@ -5,12 +5,17 @@
 /* ===== Font CSS Variables ===== */
 :root {
   --font-inter:     'Inter', system-ui, sans-serif;
+  --font-assistant: 'Assistant', system-ui, sans-serif;
   --font-playfair:  'Playfair Display', Georgia, serif;
   --font-cormorant: 'Cormorant Garamond', Georgia, serif;
   --font-oswald:    'Oswald', Impact, sans-serif;
   --font-lora:      'Lora', Georgia, serif;
   --font-dm-sans:   'DM Sans', system-ui, sans-serif;
 }
+
+/* ===== RTL / LTR font switching ===== */
+[dir="ltr"] body { font-family: var(--font-inter); }
+[dir="rtl"] body { font-family: var(--font-assistant); }
 
 /* ===== Template font utility classes ===== */
 .font-playfair  { font-family: var(--font-playfair); }

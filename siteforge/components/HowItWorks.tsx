@@ -1,37 +1,21 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
+import { t } from "@/lib/translations";
 
 /**
  * HowItWorks — 3-step process section with glassmorphism cards.
  * Scroll-triggered fade-in animations via Framer Motion.
  */
 
-const steps = [
-  {
-    number: "01",
-    icon: "🎨",
-    title: "Choose a Template",
-    description:
-      "Browse dozens of professionally designed templates tailored to your industry. From barbershops to restaurants — we have you covered.",
-  },
-  {
-    number: "02",
-    icon: "✏️",
-    title: "Fill In Your Details",
-    description:
-      "Add your business name, logo, photos, opening hours, and contact info. Our smart editor makes it effortless.",
-  },
-  {
-    number: "03",
-    icon: "🚀",
-    title: "Go Live Instantly",
-    description:
-      "Hit publish and your website is live with a shareable link in seconds. Share it on WhatsApp, Instagram, or Google Maps.",
-  },
-];
+const STEP_ICONS = ["🎨", "✏️", "🚀"];
+const STEP_NUMBERS = ["01", "02", "03"];
 
 export default function HowItWorks() {
+  const { lang } = useLanguage();
+  const text = t[lang].howItWorks;
+
   return (
     <section id="how-it-works" className="relative py-24 px-4 sm:px-6 lg:px-8">
       {/* Subtle background accent */}
@@ -49,22 +33,22 @@ export default function HowItWorks() {
           className="text-center mb-16"
         >
           <p className="text-sm font-semibold text-purple-400 uppercase tracking-widest mb-3">
-            Simple Process
+            {text.label}
           </p>
           <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4">
-            How It{" "}
-            <span className="gradient-text">Works</span>
+            {text.title}{" "}
+            <span className="gradient-text">{text.titleHighlight}</span>
           </h2>
           <p className="text-white/50 text-lg max-w-xl mx-auto">
-            Three steps from signup to a live website. No technical knowledge required.
+            {text.subtitle}
           </p>
         </motion.div>
 
         {/* Steps Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {steps.map((step, index) => (
+          {text.steps.map((step, index) => (
             <motion.div
-              key={step.number}
+              key={index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
@@ -72,17 +56,17 @@ export default function HowItWorks() {
               className="relative group glass rounded-2xl p-8 hover:border-purple-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
             >
               {/* Connector line (desktop only) */}
-              {index < steps.length - 1 && (
-                <div className="hidden md:block absolute top-12 -right-4 w-8 h-[2px] bg-gradient-to-r from-purple-500/40 to-transparent z-10" />
+              {index < text.steps.length - 1 && (
+                <div className="hidden md:block absolute top-12 -right-4 rtl:-left-4 rtl:right-auto w-8 h-[2px] bg-gradient-to-r from-purple-500/40 to-transparent z-10" />
               )}
 
               {/* Number Badge */}
               <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white text-sm font-black mb-6 shadow-lg shadow-purple-500/30">
-                {step.number}
+                {STEP_NUMBERS[index]}
               </div>
 
               {/* Icon */}
-              <div className="text-4xl mb-4">{step.icon}</div>
+              <div className="text-4xl mb-4">{STEP_ICONS[index]}</div>
 
               {/* Title */}
               <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>

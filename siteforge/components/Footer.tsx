@@ -1,31 +1,17 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
+import { t } from "@/lib/translations";
 
 /**
  * Footer — 4-column links, logo/tagline, copyright, gradient top border.
  */
 
-const footerLinks = [
-  {
-    heading: "Product",
-    links: ["Features", "Templates", "Pricing", "Changelog"],
-  },
-  {
-    heading: "Company",
-    links: ["About", "Blog", "Careers", "Contact"],
-  },
-  {
-    heading: "Legal",
-    links: ["Privacy Policy", "Terms of Service", "Cookie Policy", "GDPR"],
-  },
-  {
-    heading: "Social",
-    links: ["Twitter / X", "Instagram", "LinkedIn", "Facebook"],
-  },
-];
-
 export default function Footer() {
+  const { lang } = useLanguage();
+  const text = t[lang].footer;
+
   return (
     <footer className="relative border-t border-transparent">
       {/* Gradient Top Border */}
@@ -48,14 +34,14 @@ export default function Footer() {
           >
             {/* Brand Column */}
             <div className="col-span-2 md:col-span-1">
-              <a href="#" className="flex items-center gap-2 mb-4">
+              <a href="/" className="flex items-center gap-2 mb-4">
                 <span className="text-2xl">⚡</span>
                 <span className="text-xl font-bold">
                   <span className="gradient-text">SiteForge</span>
                 </span>
               </a>
               <p className="text-white/45 text-sm leading-relaxed">
-                The easiest way to get your business online. No code. No complexity.
+                {text.tagline}
               </p>
               {/* Mini social icons row */}
               <div className="flex items-center gap-3 mt-6">
@@ -71,7 +57,7 @@ export default function Footer() {
             </div>
 
             {/* Link Columns */}
-            {footerLinks.map((col) => (
+            {text.columns.map((col) => (
               <div key={col.heading}>
                 <h4 className="text-white font-semibold text-sm mb-4">{col.heading}</h4>
                 <ul className="space-y-2.5">
@@ -93,10 +79,10 @@ export default function Footer() {
           {/* Bottom Bar */}
           <div className="border-t border-white/5 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-white/30 text-sm">
-              © 2025 SiteForge. All rights reserved.
+              {text.copyright}
             </p>
             <p className="text-white/20 text-xs">
-              Built with ❤️ for local businesses everywhere.
+              {text.madeWith}
             </p>
           </div>
         </div>

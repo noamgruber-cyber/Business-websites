@@ -4,16 +4,32 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useEditorStore } from '@/lib/businessStore';
-import { BusinessCategory, CATEGORIES } from '@/lib/types';
+import { BusinessCategory } from '@/lib/types';
+import { useLanguage } from '@/context/LanguageContext';
+import { t } from '@/lib/translations';
 
 const VALID_CATEGORIES = new Set<BusinessCategory>([
   'barbershop', 'restaurant', 'nail_salon', 'gym', 'cafe', 'photography',
 ]);
 
+const CATEGORY_IDS: BusinessCategory[] = [
+  'barbershop', 'restaurant', 'nail_salon', 'gym', 'cafe', 'photography',
+];
+const CATEGORY_EMOJIS: Record<BusinessCategory, string> = {
+  barbershop:  '💈',
+  restaurant:  '🍕',
+  nail_salon:  '💅',
+  gym:         '🏋️',
+  cafe:        '☕',
+  photography: '📸',
+};
+
 function CreateForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { initBusiness } = useEditorStore();
+  const { lang } = useLanguage();
+  const text = t[lang].create;
 
   const paramCategory = searchParams.get('category') as BusinessCategory | null;
   const initialCategory = paramCategory && VALID_CATEGORIES.has(paramCategory) ? paramCategory : null;
@@ -27,7 +43,7 @@ function CreateForm() {
   const handleContinue = () => {
     if (!selected) return;
     const id = crypto.randomUUID();
-    initBusiness(id, selected);
+    initBusiness(id, selected, lang);
     router.push(`/edit/${id}`);
   };
 
@@ -40,10 +56,10 @@ function CreateForm() {
           href="/"
           className="flex items-center gap-2 text-white/40 hover:text-white/80 text-sm transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-4 h-4 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
-          Back to home
+          {text.backHome}
         </Link>
 
         {/* Step indicator */}
@@ -56,30 +72,31 @@ function CreateForm() {
               }`}
             />
           ))}
-          <span className="text-white/35 text-xs ml-2">Step 1 of 5</span>
+          <span className="text-white/35 text-xs ms-2">{text.stepLabel}</span>
         </div>
       </div>
 
       {/* Heading */}
       <div className="max-w-5xl mx-auto w-full text-center mb-12">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4">
-          What type of business do you have?
+          {text.title}
         </h1>
         <p className="text-white/45 text-base sm:text-lg">
-          Choose your category to see matching templates
+          {text.subtitle}
         </p>
       </div>
 
       {/* Category grid */}
       <div className="max-w-5xl mx-auto w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
-        {CATEGORIES.map((cat) => {
-          const isSelected = selected === cat.id;
+        {CATEGORY_IDS.map((catId) => {
+          const cat = text.categories[catId];
+          const isSelected = selected === catId;
           return (
             <button
-              key={cat.id}
-              onClick={() => setSelected(cat.id)}
+              key={catId}
+              onClick={() => setSelected(catId)}
               className={`
-                group relative text-left rounded-2xl border p-6 transition-all duration-200
+                group relative text-start rounded-2xl border p-6 transition-all duration-200
                 bg-white/[0.03] hover:bg-white/[0.06]
                 ${isSelected
                   ? 'border-purple-500 shadow-lg shadow-purple-500/20 scale-[1.02]'
@@ -89,7 +106,7 @@ function CreateForm() {
             >
               {/* Checkmark badge */}
               {isSelected && (
-                <span className="absolute top-3 right-3 w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center">
+                <span className="absolute top-3 end-3 w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center">
                   <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
@@ -102,7 +119,7 @@ function CreateForm() {
                   isSelected ? 'scale-110' : 'group-hover:scale-105'
                 }`}
               >
-                {cat.emoji}
+                {CATEGORY_EMOJIS[catId]}
               </div>
 
               {/* Name */}
@@ -135,8 +152,8 @@ function CreateForm() {
             onClick={handleContinue}
             className="mx-auto flex items-center gap-3 px-10 py-4 rounded-2xl font-bold text-lg text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-xl shadow-purple-500/30 transition-all duration-200 hover:scale-[1.02]"
           >
-            Continue
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            {text.continueBtn}
+            <svg className="w-5 h-5 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </button>

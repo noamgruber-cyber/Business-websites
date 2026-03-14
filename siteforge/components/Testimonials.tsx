@@ -1,40 +1,19 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
+import { t } from "@/lib/translations";
 
 /**
  * Testimonials — Social proof section with 3 glassmorphism quote cards.
  */
 
-const testimonials = [
-  {
-    initials: "AC",
-    avatarColor: "from-amber-500 to-orange-600",
-    name: "Avi Cohen",
-    business: "Cohen's Barbershop, Tel Aviv",
-    rating: 5,
-    quote:
-      "I had my website up in literally 10 minutes. My customers can now book online and find my hours instantly. SiteForge is a game-changer for a small business like mine.",
-  },
-  {
-    initials: "MR",
-    avatarColor: "from-red-500 to-pink-600",
-    name: "Maria Rossi",
-    business: "Rossi's Pizzeria, Haifa",
-    rating: 5,
-    quote:
-      "We went from zero online presence to a beautiful website with a full menu and contact form. Our orders have increased by 30% since launching. Incredible value.",
-  },
-  {
-    initials: "DL",
-    avatarColor: "from-violet-500 to-purple-600",
-    name: "Dana Levi",
-    business: "DanaGlow Nail Studio, Jerusalem",
-    rating: 5,
-    quote:
-      "The templates are so professional — clients always compliment how modern my website looks. I never imagined I could have something this beautiful without hiring a developer.",
-  },
+const AVATAR_COLORS = [
+  "from-amber-500 to-orange-600",
+  "from-red-500 to-pink-600",
+  "from-violet-500 to-purple-600",
 ];
+const AVATAR_INITIALS = ["AC", "MR", "DL"];
 
 function StarRating({ count }: { count: number }) {
   return (
@@ -49,6 +28,9 @@ function StarRating({ count }: { count: number }) {
 }
 
 export default function Testimonials() {
+  const { lang } = useLanguage();
+  const text = t[lang].testimonials;
+
   return (
     <section className="relative py-24 px-4 sm:px-6 lg:px-8">
       {/* Background accent */}
@@ -66,22 +48,22 @@ export default function Testimonials() {
           className="text-center mb-16"
         >
           <p className="text-sm font-semibold text-purple-400 uppercase tracking-widest mb-3">
-            Customer Stories
+            {text.label}
           </p>
           <h2 className="text-4xl sm:text-5xl font-black tracking-tight mb-4">
-            Loved by{" "}
-            <span className="gradient-text">Business Owners</span>
+            {text.title}{" "}
+            <span className="gradient-text">{text.titleHighlight}</span>
           </h2>
           <p className="text-white/50 text-lg max-w-xl mx-auto">
-            Thousands of local businesses have already launched with SiteForge.
+            {text.subtitle}
           </p>
         </motion.div>
 
         {/* Testimonial Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-          {testimonials.map((t, index) => (
+          {text.items.map((item, index) => (
             <motion.div
-              key={t.name}
+              key={index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
@@ -89,24 +71,23 @@ export default function Testimonials() {
               className="glass rounded-2xl p-8 flex flex-col gap-5 hover:border-purple-500/30 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
             >
               {/* Stars */}
-              <StarRating count={t.rating} />
+              <StarRating count={5} />
 
               {/* Quote */}
               <p className="text-white/70 leading-relaxed flex-1 text-sm">
-                &ldquo;{t.quote}&rdquo;
+                &ldquo;{item.quote}&rdquo;
               </p>
 
               {/* Author */}
               <div className="flex items-center gap-3 pt-2 border-t border-white/5">
-                {/* Avatar Circle */}
                 <div
-                  className={`w-10 h-10 rounded-full bg-gradient-to-br ${t.avatarColor} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}
+                  className={`w-10 h-10 rounded-full bg-gradient-to-br ${AVATAR_COLORS[index]} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}
                 >
-                  {t.initials}
+                  {AVATAR_INITIALS[index]}
                 </div>
                 <div>
-                  <p className="text-white font-semibold text-sm">{t.name}</p>
-                  <p className="text-white/40 text-xs">{t.business}</p>
+                  <p className="text-white font-semibold text-sm">{item.name}</p>
+                  <p className="text-white/40 text-xs">{item.biz}</p>
                 </div>
               </div>
             </motion.div>
@@ -121,11 +102,7 @@ export default function Testimonials() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-16 grid grid-cols-3 gap-6 max-w-2xl mx-auto text-center"
         >
-          {[
-            { value: "5,000+", label: "Websites launched" },
-            { value: "4.9/5", label: "Average rating" },
-            { value: "98%", label: "Customer satisfaction" },
-          ].map((stat) => (
+          {text.stats.map((stat) => (
             <div key={stat.label}>
               <p className="text-3xl font-black gradient-text">{stat.value}</p>
               <p className="text-white/40 text-sm mt-1">{stat.label}</p>
