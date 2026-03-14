@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useEditorStore } from '@/lib/businessStore';
 import { saveBusiness, checkSlugAvailable } from '@/lib/firestore';
+import { useAuth } from '@/context/AuthContext';
 
 const CATEGORY_LABELS: Record<string, string> = {
   barbershop:  '💈 Barbershop',
@@ -35,6 +36,7 @@ type PublishState = 'idle' | 'checking' | 'saving' | 'done' | 'error';
 
 export default function Step5_Publish() {
   const router = useRouter();
+  const { user } = useAuth();
   const { businessData, updateBusinessData, setStep } = useEditorStore();
 
   const [slugError, setSlugError]     = useState<string | null>(null);
@@ -66,7 +68,14 @@ export default function Step5_Publish() {
 
       // 2 — Save to Firestore
       setPublishState('saving');
-      const publishedData = { ...businessData, publishedAt: new Date().toISOString() };
+      const publishedData = {
+        ...businessData,
+        publishedAt:   new Date().toISOString(),
+        ownerUid:      user?.uid          ?? '',
+        ownerEmail:    user?.email        ?? '',
+        ownerName:     user?.displayName  ?? '',
+        ownerPhotoUrl: user?.photoURL     ?? '',
+      };
       await saveBusiness(publishedData);
       updateBusinessData({ publishedAt: publishedData.publishedAt });
 

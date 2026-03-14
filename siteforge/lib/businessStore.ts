@@ -65,6 +65,10 @@ const EMPTY_BUSINESS: BusinessData = {
   facebook:  '',
   whatsapp:  '',
   openingHours: DEFAULT_OPENING_HOURS,
+  ownerUid:      '',
+  ownerEmail:    '',
+  ownerName:     '',
+  ownerPhotoUrl: '',
   slug:        '',
   publishedAt: null,
   createdAt:   '',
@@ -78,6 +82,7 @@ type EditorStore = {
   setStep:            (step: number) => void;
   updateBusinessData: (updates: Partial<BusinessData>) => void;
   initBusiness:       (id: string, category: BusinessCategory) => void;
+  loadBusiness:       (data: BusinessData) => void;
   reset:              () => void;
 };
 
@@ -105,6 +110,8 @@ export const useEditorStore = create<EditorStore>((set) => ({
         createdAt:  new Date().toISOString(),
       },
     }),
+
+  loadBusiness: (data) => set({ currentStep: 1, businessData: data }),
 
   reset: () => set({ currentStep: 1, businessData: EMPTY_BUSINESS }),
 }));

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { useAuth } from "@/context/AuthContext";
 
 /**
  * Navbar — Sticky top navigation with frosted glass on scroll.
@@ -10,6 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user, loading } = useAuth();
 
   // Detect scroll position to apply frosted glass style
   useEffect(() => {
@@ -57,12 +60,27 @@ export default function Navbar() {
         </ul>
 
         {/* ===== Desktop CTA ===== */}
-        <a
-          href="#pricing"
-          className="hidden md:inline-flex items-center gap-1 gradient-btn text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-lg shadow-purple-500/20"
-        >
-          Create Your Website →
-        </a>
+        {!loading && (
+          user ? (
+            <Link
+              href="/dashboard"
+              className="hidden md:inline-flex items-center gap-2 gradient-btn text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-lg shadow-purple-500/20"
+            >
+              {user.photoURL && (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={user.photoURL} alt="" referrerPolicy="no-referrer" className="w-5 h-5 rounded-full" />
+              )}
+              Dashboard →
+            </Link>
+          ) : (
+            <Link
+              href="/login"
+              className="hidden md:inline-flex items-center gap-1 gradient-btn text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-lg shadow-purple-500/20"
+            >
+              Sign In →
+            </Link>
+          )
+        )}
 
         {/* ===== Mobile Hamburger ===== */}
         <button
@@ -111,13 +129,23 @@ export default function Navbar() {
                 </li>
               ))}
               <li className="pt-2">
-                <a
-                  href="#pricing"
-                  className="inline-flex items-center gap-1 gradient-btn text-white text-sm font-semibold px-5 py-2.5 rounded-full"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  Create Your Website →
-                </a>
+                {user ? (
+                  <Link
+                    href="/dashboard"
+                    className="inline-flex items-center gap-1 gradient-btn text-white text-sm font-semibold px-5 py-2.5 rounded-full"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Dashboard →
+                  </Link>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center gap-1 gradient-btn text-white text-sm font-semibold px-5 py-2.5 rounded-full"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Sign In →
+                  </Link>
+                )}
               </li>
             </ul>
           </motion.div>

@@ -6,6 +6,7 @@ import {
   getDocs,
   updateDoc,
   query,
+  where,
   orderBy,
   limit,
 } from 'firebase/firestore';
@@ -49,4 +50,11 @@ export async function checkSlugAvailable(slug: string): Promise<boolean> {
   const ref  = doc(db, COL, slug);
   const snap = await getDoc(ref);
   return !snap.exists();
+}
+
+// ── Fetch all businesses owned by a user ─────────────────────────────────────
+export async function getBusinessesByUser(uid: string): Promise<BusinessData[]> {
+  const q    = query(collection(db, COL), where('ownerUid', '==', uid), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => d.data() as BusinessData);
 }

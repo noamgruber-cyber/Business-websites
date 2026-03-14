@@ -53,6 +53,12 @@ export type BusinessData = {
   whatsapp: string;
   openingHours: OpeningHours;
 
+  // Owner (populated when published via auth)
+  ownerUid:      string;
+  ownerEmail:    string;
+  ownerName:     string;
+  ownerPhotoUrl: string;
+
   // Meta
   slug: string;              // URL slug e.g. "cohen-barbershop-tlv"
   publishedAt: string | null;
