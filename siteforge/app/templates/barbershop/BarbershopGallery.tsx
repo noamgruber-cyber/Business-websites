@@ -48,8 +48,12 @@ export default function BarbershopGallery({ business }: Props) {
           style={{ columnCount: 'auto', columnWidth: '260px', columnGap: '8px' }}
         >
           {photos.map((url, i) => (
-            <div
+            <motion.div
               key={i}
+              initial={{ opacity: 0, filter: 'blur(12px)', scale: 1.02 }}
+              whileInView={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
+              transition={{ duration: 0.7, delay: i * 0.06, ease: 'easeOut' }}
+              viewport={{ once: true }}
               className="group relative overflow-hidden mb-2 break-inside-avoid cursor-pointer"
               style={{ breakInside: 'avoid' }}
             >
@@ -75,7 +79,7 @@ export default function BarbershopGallery({ business }: Props) {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 15.803a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6" />
                 </svg>
               </div>
-            </div>
+            </motion.div>
           ))}
         </motion.div>
 

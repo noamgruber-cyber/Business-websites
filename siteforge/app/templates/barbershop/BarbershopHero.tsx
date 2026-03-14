@@ -19,11 +19,13 @@ export default function BarbershopHero({ business }: Props) {
       id="hero"
       className="relative h-screen flex flex-col justify-between overflow-hidden"
     >
-      {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${business.coverPhotoUrl})` }}
-      />
+      {/* Background image with Ken Burns zoom */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover bg-center ken-burns"
+          style={{ backgroundImage: `url(${business.coverPhotoUrl})` }}
+        />
+      </div>
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/72" />
       {/* Diagonal stripe texture */}

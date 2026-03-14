@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
+
 type InputFieldProps = {
   label: string;
   value: string;
@@ -14,7 +16,7 @@ type InputFieldProps = {
 };
 
 /**
- * Reusable dark-themed input field with label, helper text, and error state.
+ * Reusable dark-themed input field with label, helper text, error state, and shake animation.
  */
 export default function InputField({
   label,
@@ -28,11 +30,25 @@ export default function InputField({
   readOnly = false,
   className = '',
 }: InputFieldProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const prevError = useRef<string | undefined>(undefined);
+
+  // Trigger shake when a new error appears
+  useEffect(() => {
+    if (error && error !== prevError.current && wrapperRef.current) {
+      wrapperRef.current.classList.remove('shake');
+      // Force reflow to restart animation
+      void wrapperRef.current.offsetWidth;
+      wrapperRef.current.classList.add('shake');
+    }
+    prevError.current = error;
+  }, [error]);
+
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
+    <div ref={wrapperRef} className={`flex flex-col gap-1.5 ${className}`}>
       <label className="text-sm font-medium text-white/80">
         {label}
-        {required && <span className="text-purple-400 ml-1">*</span>}
+        {required && <span className="text-purple-400 ms-1">*</span>}
       </label>
 
       <input
@@ -47,7 +63,7 @@ export default function InputField({
           ${readOnly ? 'cursor-default opacity-60' : ''}
           ${
             error
-              ? 'border-red-500/60 focus:border-red-500'
+              ? 'border-red-500/60 focus:border-red-500 focus:shadow-[0_0_0_3px_rgba(239,68,68,0.12)]'
               : 'border-white/10 focus:border-purple-500 focus:shadow-[0_0_0_3px_rgba(139,92,246,0.15)]'
           }
         `}

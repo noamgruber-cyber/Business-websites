@@ -3,12 +3,14 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { getBusinessesByUser, deleteBusiness } from '@/lib/firestore';
 import { BusinessData } from '@/lib/types';
 import { useEditorStore } from '@/lib/businessStore';
 import { useLanguage } from '@/context/LanguageContext';
 import { t, type Translations } from '@/lib/translations';
+import { SkeletonDashboardGrid } from '@/components/ui/Skeleton';
 
 type DashboardText = Translations['en']['dashboard'] | Translations['he']['dashboard'];
 
@@ -113,7 +115,12 @@ export default function DashboardPage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-8 py-10">
 
         {/* ── Page title + new button ── */}
-        <div className="flex items-start justify-between gap-4 mb-10">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex items-start justify-between gap-4 mb-10"
+        >
           <div>
             <h1 className="text-3xl sm:text-4xl font-black text-white mb-1">{text.title}</h1>
             <p className="text-white/40 text-sm">
@@ -133,60 +140,82 @@ export default function DashboardPage() {
             </svg>
             {text.newWebsite}
           </Link>
-        </div>
+        </motion.div>
 
         {/* ── Content ── */}
         {fetching ? (
-          <div className="flex items-center justify-center py-24">
-            <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
-          </div>
+          <SkeletonDashboardGrid />
         ) : businesses.length === 0 ? (
           <EmptyState text={text} />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {businesses.map((b) => (
-              <BusinessCard
-                key={b.id}
-                business={b}
-                text={text}
-                onEdit={() => handleEdit(b)}
-                onDelete={() => setDeleteTarget(b)}
-              />
-            ))}
-          </div>
+          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <AnimatePresence>
+              {businesses.map((b, i) => (
+                <motion.div
+                  key={b.id}
+                  layout
+                  initial={{ opacity: 0, y: 20, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+                  transition={{ duration: 0.35, delay: i * 0.06, ease: 'easeOut' }}
+                >
+                  <BusinessCard
+                    business={b}
+                    text={text}
+                    onEdit={() => handleEdit(b)}
+                    onDelete={() => setDeleteTarget(b)}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         )}
       </main>
 
       {/* ── Delete confirmation modal ── */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#111118] border border-white/10 rounded-2xl p-7 max-w-sm w-full shadow-2xl">
-            <div className="text-3xl mb-4 text-center">🗑️</div>
-            <h2 className="text-xl font-bold text-white text-center mb-2">{text.deleteTitle}</h2>
-            <p className="text-white/45 text-sm text-center mb-7">
-              <strong className="text-white/70">{deleteTarget.businessName}</strong>{' '}
-              {text.deleteBody}
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                disabled={deleting}
-                className="flex-1 py-2.5 rounded-xl border border-white/15 text-white/60 hover:text-white text-sm font-medium transition-colors disabled:opacity-50"
-              >
-                {text.cancelBtn}
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                disabled={deleting}
-                className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {deleting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-                {deleting ? text.deletingBtn : text.deleteBtn}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {deleteTarget && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 16 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 16 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+              className="bg-[#111118] border border-white/10 rounded-2xl p-7 max-w-sm w-full shadow-2xl"
+            >
+              <div className="text-3xl mb-4 text-center">🗑️</div>
+              <h2 className="text-xl font-bold text-white text-center mb-2">{text.deleteTitle}</h2>
+              <p className="text-white/45 text-sm text-center mb-7">
+                <strong className="text-white/70">{deleteTarget.businessName}</strong>{' '}
+                {text.deleteBody}
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  disabled={deleting}
+                  className="flex-1 py-2.5 rounded-xl border border-white/15 text-white/60 hover:text-white text-sm font-medium transition-colors disabled:opacity-50"
+                >
+                  {text.cancelBtn}
+                </button>
+                <motion.button
+                  whileTap={{ scale: 0.97 }}
+                  onClick={handleDeleteConfirm}
+                  disabled={deleting}
+                  className="flex-1 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white text-sm font-semibold transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {deleting && <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
+                  {deleting ? text.deletingBtn : text.deleteBtn}
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -274,7 +303,8 @@ function BusinessCard({
               {text.viewBtn}
             </Link>
           )}
-          <button
+          <motion.button
+            whileTap={{ scale: 0.85 }}
             onClick={onDelete}
             title="Delete website"
             className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/[0.04] hover:bg-red-500/20 border border-white/10 hover:border-red-500/40 text-white/30 hover:text-red-400 transition-all duration-200 flex-shrink-0"
@@ -282,7 +312,7 @@ function BusinessCard({
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
-          </button>
+          </motion.button>
         </div>
       </div>
     </div>
@@ -292,8 +322,19 @@ function BusinessCard({
 // ── Empty state ───────────────────────────────────────────────────────────────
 function EmptyState({ text }: { text: DashboardText }) {
   return (
-    <div className="text-center py-24">
-      <div className="text-7xl mb-5">🏗️</div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="text-center py-24"
+    >
+      <motion.div
+        className="text-7xl mb-5"
+        animate={{ rotate: [0, -5, 5, 0] }}
+        transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+      >
+        🏗️
+      </motion.div>
       <h2 className="text-2xl font-bold text-white mb-3">{text.emptyTitle}</h2>
       <p className="text-white/40 text-base mb-8 max-w-sm mx-auto leading-relaxed">
         {text.emptyDesc}
@@ -304,6 +345,6 @@ function EmptyState({ text }: { text: DashboardText }) {
       >
         {text.emptyCreate}
       </Link>
-    </div>
+    </motion.div>
   );
 }

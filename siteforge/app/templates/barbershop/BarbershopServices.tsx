@@ -35,15 +35,16 @@ export default function BarbershopServices({ business }: Props) {
           <div className="mt-5 mx-auto w-16 h-[2px]" style={{ backgroundColor: GOLD }} />
         </motion.div>
 
-        {/* Services grid */}
+        {/* Services grid — alternating slide-in */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {business.services.map((service, i) => (
             <motion.div
               key={service.id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
+              initial={{ opacity: 0, x: i % 2 === 0 ? -40 : 40 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.55, delay: i * 0.08, ease: 'easeOut' }}
               viewport={{ once: true }}
+              whileHover={{ y: -4, transition: { type: 'spring', stiffness: 300, damping: 20 } }}
               className="group relative overflow-hidden transition-all duration-300"
               style={{
                 backgroundColor: CARD,

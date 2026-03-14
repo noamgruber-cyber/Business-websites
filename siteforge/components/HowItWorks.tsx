@@ -6,7 +6,7 @@ import { t } from "@/lib/translations";
 
 /**
  * HowItWorks — 3-step process section with glassmorphism cards.
- * Scroll-triggered fade-in animations via Framer Motion.
+ * Scroll-triggered fade-in animations + hover lift + radar pulse badges.
  */
 
 const STEP_ICONS = ["🎨", "✏️", "🚀"];
@@ -24,12 +24,12 @@ export default function HowItWorks() {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
-        {/* Section Header */}
+        {/* Section Header — text from left */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: -40 }}
+          whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-center mb-16"
         >
           <p className="text-sm font-semibold text-purple-400 uppercase tracking-widest mb-3">
@@ -49,24 +49,44 @@ export default function HowItWorks() {
           {text.steps.map((step, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 40, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: "-80px" }}
-              transition={{ duration: 0.6, delay: index * 0.15 }}
-              className="relative group glass rounded-2xl p-8 hover:border-purple-500/40 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10"
+              transition={{ duration: 0.55, delay: index * 0.15, ease: "easeOut" }}
+              whileHover={{ y: -6, transition: { type: "spring", stiffness: 300, damping: 20 } }}
+              className="relative group glass rounded-2xl p-8 hover:border-purple-500/40 transition-colors duration-300 hover:shadow-xl hover:shadow-purple-500/15 cursor-default"
             >
+              {/* Hover glow overlay */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-600/0 to-blue-600/0 group-hover:from-purple-600/8 group-hover:to-blue-600/8 transition-all duration-300 pointer-events-none" />
+
               {/* Connector line (desktop only) */}
               {index < text.steps.length - 1 && (
-                <div className="hidden md:block absolute top-12 -right-4 rtl:-left-4 rtl:right-auto w-8 h-[2px] bg-gradient-to-r from-purple-500/40 to-transparent z-10" />
+                <div className="hidden md:block absolute top-12 -end-4 w-8 h-[2px] bg-gradient-to-r from-purple-500/40 to-transparent z-10 rtl:bg-gradient-to-l" />
               )}
 
-              {/* Number Badge */}
-              <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white text-sm font-black mb-6 shadow-lg shadow-purple-500/30">
+              {/* Number Badge with radar pulse */}
+              <div className="relative inline-flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 text-white text-sm font-black mb-6 shadow-lg shadow-purple-500/30">
                 {STEP_NUMBERS[index]}
+                {/* Radar pulse rings */}
+                <motion.span
+                  className="absolute inset-0 rounded-full border border-purple-500/40"
+                  animate={{ scale: [1, 1.8], opacity: [0.6, 0] }}
+                  transition={{ duration: 1.8, repeat: Infinity, delay: index * 0.6, ease: "easeOut" }}
+                />
+                <motion.span
+                  className="absolute inset-0 rounded-full border border-purple-400/20"
+                  animate={{ scale: [1, 2.4], opacity: [0.4, 0] }}
+                  transition={{ duration: 1.8, repeat: Infinity, delay: index * 0.6 + 0.3, ease: "easeOut" }}
+                />
               </div>
 
-              {/* Icon */}
-              <div className="text-4xl mb-4">{STEP_ICONS[index]}</div>
+              {/* Icon with bounce on hover */}
+              <motion.div
+                className="text-4xl mb-4"
+                whileHover={{ rotate: [0, -10, 10, -5, 0], transition: { duration: 0.5 } }}
+              >
+                {STEP_ICONS[index]}
+              </motion.div>
 
               {/* Title */}
               <h3 className="text-xl font-bold text-white mb-3">{step.title}</h3>
