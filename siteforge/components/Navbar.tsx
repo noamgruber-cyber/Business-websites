@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -8,13 +8,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { t } from "@/lib/translations";
 
 /**
- * Navbar — Sticky top navigation with frosted glass on scroll.
- * Mobile: hamburger menu with animated staggered dropdown.
+ * Navbar — Logo | Features · Templates · Pricing · More ▼ | Lang + CTA
+ * "More" opens a glassmorphism dropdown with How It Works, Examples, Blog, About, Contact
  */
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+  const moreRef = useRef<HTMLDivElement>(null);
   const { user, loading } = useAuth();
   const { lang, toggleLang } = useLanguage();
   const text = t[lang].nav;
@@ -25,12 +27,54 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = [
-    { label: text.features,   href: "/#how-it-works" },
-    { label: text.howItWorks, href: "/how-it-works" },
-    { label: text.templates,  href: "/#templates" },
-    { label: text.pricing,    href: "/pricing" },
-    { label: text.blog,       href: "/blog" },
+  // Close "More" dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const mainLinks = [
+    { label: text.features,  href: "/#how-it-works" },
+    { label: text.templates, href: "/#templates" },
+    { label: text.pricing,   href: "/pricing" },
+  ];
+
+  const moreLinks = [
+    {
+      label: text.howItWorks,
+      href: "/how-it-works",
+      icon: "🗺️",
+      desc: lang === "he" ? "סיור שלב-אחר-שלב בפלטפורמה" : "A step-by-step platform tour",
+    },
+    {
+      label: text.examples,
+      href: "/examples",
+      icon: "🖼️",
+      desc: lang === "he" ? "אתרים אמיתיים שנבנו עם SiteForge" : "Real websites built with SiteForge",
+    },
+    {
+      label: text.blog,
+      href: "/blog",
+      icon: "✍️",
+      desc: lang === "he" ? "טיפים לצמיחת עסק ברשת" : "Tips to grow your business online",
+    },
+    {
+      label: text.about,
+      href: "/about",
+      icon: "⚡",
+      desc: lang === "he" ? "הסיפור שמאחורי SiteForge" : "The story behind SiteForge",
+    },
+    {
+      label: text.contact,
+      href: "/contact",
+      icon: "💬",
+      desc: lang === "he" ? "נשמח לשמוע ממך" : "We'd love to hear from you",
+    },
   ];
 
   const mobileItemVariants = {
@@ -79,7 +123,7 @@ export default function Navbar() {
 
         {/* ===== Desktop Nav Links ===== */}
         <ul className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
+          {mainLinks.map((link) => (
             <li key={link.label}>
               <Link
                 href={link.href}
@@ -101,11 +145,90 @@ export default function Navbar() {
               </Link>
             </li>
           ))}
+
+          {/* More dropdown */}
+          <li>
+            <div ref={moreRef} className="relative">
+              <button
+                onClick={() => setMoreOpen((v) => !v)}
+                onMouseEnter={() => setHoveredLink(text.more)}
+                onMouseLeave={() => setHoveredLink(null)}
+                className="relative flex items-center gap-1 text-sm font-medium text-white/70 hover:text-white transition-colors duration-200 py-1"
+                aria-expanded={moreOpen}
+                aria-haspopup="true"
+              >
+                {text.more}
+                <motion.span
+                  animate={{ rotate: moreOpen ? 180 : 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="text-[10px] text-white/50 mt-0.5"
+                >
+                  ▼
+                </motion.span>
+                {hoveredLink === text.more && (
+                  <motion.span
+                    layoutId="nav-underline"
+                    className="absolute bottom-0 start-0 end-0 h-px bg-gradient-to-r from-purple-500 to-blue-500"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  />
+                )}
+              </button>
+
+              {/* Dropdown panel */}
+              <AnimatePresence>
+                {moreOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                    className="absolute top-full mt-3 start-1/2 -translate-x-1/2 w-72 rounded-2xl overflow-hidden"
+                    style={{
+                      background: "rgba(10, 10, 20, 0.85)",
+                      backdropFilter: "blur(20px)",
+                      WebkitBackdropFilter: "blur(20px)",
+                      border: "1px solid rgba(255,255,255,0.08)",
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(139,92,246,0.1)",
+                    }}
+                  >
+                    <div className="p-2">
+                      {moreLinks.map((item, i) => (
+                        <motion.div
+                          key={item.label}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.04, duration: 0.15 }}
+                        >
+                          <Link
+                            href={item.href}
+                            onClick={() => setMoreOpen(false)}
+                            className="group flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors duration-150 border-s-2 border-transparent hover:border-purple-500"
+                          >
+                            <span className="text-lg mt-0.5 leading-none">{item.icon}</span>
+                            <div>
+                              <div className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">
+                                {item.label}
+                              </div>
+                              <div className="text-xs text-white/35 mt-0.5 leading-snug">
+                                {item.desc}
+                              </div>
+                            </div>
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </li>
         </ul>
 
         {/* ===== Desktop right side: lang toggle + CTA ===== */}
         <div className="hidden md:flex items-center gap-3">
-          {/* Language toggle */}
           <motion.button
             onClick={toggleLang}
             whileTap={{ scale: 0.95 }}
@@ -177,8 +300,9 @@ export default function Navbar() {
             transition={{ duration: 0.25 }}
             className="md:hidden bg-[#0a0a0f]/95 backdrop-blur-xl border-b border-white/5 overflow-hidden"
           >
-            <ul className="flex flex-col px-6 py-4 gap-4">
-              {navLinks.map((link, i) => (
+            <ul className="flex flex-col px-6 py-4 gap-2">
+              {/* Main links */}
+              {mainLinks.map((link, i) => (
                 <motion.li
                   key={link.label}
                   custom={i}
@@ -189,15 +313,49 @@ export default function Navbar() {
                 >
                   <Link
                     href={link.href}
-                    className="text-base font-medium text-white/80 hover:text-white transition-colors"
+                    className="text-base font-medium text-white/80 hover:text-white transition-colors block py-1.5"
                     onClick={() => setMenuOpen(false)}
                   >
                     {link.label}
                   </Link>
                 </motion.li>
               ))}
+
+              {/* Divider */}
               <motion.li
-                custom={navLinks.length}
+                custom={mainLinks.length}
+                variants={mobileItemVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+              >
+                <div className="border-t border-white/8 my-1" />
+              </motion.li>
+
+              {/* More links (flat in mobile) */}
+              {moreLinks.map((link, i) => (
+                <motion.li
+                  key={link.label}
+                  custom={mainLinks.length + 1 + i}
+                  variants={mobileItemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                >
+                  <Link
+                    href={link.href}
+                    className="flex items-center gap-2 text-sm font-medium text-white/60 hover:text-white transition-colors py-1.5"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <span className="text-base">{link.icon}</span>
+                    {link.label}
+                  </Link>
+                </motion.li>
+              ))}
+
+              {/* CTA row */}
+              <motion.li
+                custom={mainLinks.length + moreLinks.length + 2}
                 variants={mobileItemVariants}
                 initial="hidden"
                 animate="visible"
