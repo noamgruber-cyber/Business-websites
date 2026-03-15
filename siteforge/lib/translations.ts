@@ -366,7 +366,7 @@ export const t = {
           heading: 'משאבים',
           links: [
             { label: 'בלוג', href: '/blog' },
-            { label: 'מרכז עזרה', href: '#' },
+            { label: 'מרכז עזרה', href: '/help' },
             { label: 'מדריכי וידאו', href: '#' },
             { label: 'מסמכי API', href: '#' },
             { label: 'דף סטטוס', href: '#' },
@@ -761,7 +761,7 @@ export const t = {
           heading: 'משאבים / Resources',
           links: [
             { label: 'Blog', href: '/blog' },
-            { label: 'Help Center', href: '#' },
+            { label: 'Help Center', href: '/help' },
             { label: 'Video Tutorials', href: '#' },
             { label: 'API Docs', href: '#' },
             { label: 'Status Page', href: '#' },

@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { getBusinessesByUser, deleteBusiness } from '@/lib/firestore';
+import { getAnalytics, type AnalyticsData } from '@/lib/analytics';
 import { BusinessData } from '@/lib/types';
 import { useEditorStore } from '@/lib/businessStore';
 import { useLanguage } from '@/context/LanguageContext';
@@ -22,6 +23,150 @@ const CATEGORY_EMOJI: Record<string, string> = {
   cafe:        '☕',
   photography: '📸',
 };
+
+// ── Helpers ────────────────────────────────────────────────────────────────────
+function relativeTime(iso: string): string {
+  if (!iso) return '—';
+  const diff = Date.now() - new Date(iso).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 2) return 'just now';
+  if (m < 60) return `${m} min ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
+
+function getLast7Days(): string[] {
+  const days: string[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  return days;
+}
+
+function dayLabel(iso: string): string {
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  return days[new Date(iso).getDay()];
+}
+
+function insightTip(a: AnalyticsData): string {
+  if (a.totalClicks.whatsapp > 0)
+    return `💡 ${a.totalClicks.whatsapp} people clicked your WhatsApp — great engagement!`;
+  if (a.totalViews > 50)
+    return '🔥 Your page has over 50 views — consider upgrading for more analytics';
+  if (a.totalClicks.instagram === 0)
+    return '💡 Tip: Add your Instagram to get more followers from your website';
+  if (a.totalViews === 0)
+    return '👀 Share your link to get your first visitors!';
+  return '📈 Keep sharing your link to grow your audience';
+}
+
+// ── Mini analytics panel ───────────────────────────────────────────────────────
+function AnalyticsPanel({ slug }: { slug: string }) {
+  const [data, setData] = useState<AnalyticsData | null | 'loading'>('loading');
+
+  useEffect(() => {
+    getAnalytics(slug)
+      .then((d) => setData(d ?? { totalViews: 0, totalClicks: { whatsapp: 0, instagram: 0, phone: 0, facebook: 0 }, dailyViews: {}, lastVisitedAt: '' }))
+      .catch(() => setData(null));
+  }, [slug]);
+
+  if (data === 'loading') {
+    return (
+      <div className="flex items-center justify-center py-6">
+        <div className="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!data) {
+    return <p className="text-white/30 text-xs py-4 text-center">Analytics unavailable</p>;
+  }
+
+  const last7 = getLast7Days();
+  const counts = last7.map((d) => data.dailyViews[d] ?? 0);
+  const maxCount = Math.max(...counts, 1);
+
+  const clicks = data.totalClicks;
+  const clickTypes = [
+    { key: 'whatsapp', icon: '📱', label: 'WhatsApp' },
+    { key: 'instagram', icon: '📸', label: 'Instagram' },
+    { key: 'phone', icon: '📞', label: 'Phone' },
+    { key: 'facebook', icon: '👥', label: 'Facebook' },
+  ] as const;
+
+  return (
+    <div className="px-5 pb-5 space-y-5">
+      {/* Total views */}
+      <div className="flex items-center justify-between">
+        <div>
+          <span className="text-3xl font-black text-white">{data.totalViews.toLocaleString()}</span>
+          <p className="text-white/40 text-xs mt-0.5">Total Page Views</p>
+        </div>
+        {data.lastVisitedAt && (
+          <p className="text-white/25 text-xs text-right">
+            Last visited<br />
+            <span className="text-white/40">{relativeTime(data.lastVisitedAt)}</span>
+          </p>
+        )}
+      </div>
+
+      {/* Click breakdown */}
+      <div className="grid grid-cols-4 gap-2">
+        {clickTypes.map(({ key, icon, label }) => (
+          <div key={key} className="bg-white/[0.03] rounded-xl p-2.5 text-center border border-white/5">
+            <div className="text-lg mb-0.5">{icon}</div>
+            <div className="text-white font-bold text-sm">{clicks[key]}</div>
+            <div className="text-white/30 text-[10px]">{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* 7-day bar chart */}
+      <div>
+        <p className="text-white/30 text-[10px] uppercase tracking-wider mb-2">Last 7 Days</p>
+        <div className="flex items-end gap-1 h-20">
+          {last7.map((date, i) => {
+            const val = counts[i];
+            const heightPct = Math.max((val / maxCount) * 100, val > 0 ? 8 : 4);
+            const isMax = val === maxCount && val > 0;
+            return (
+              <div key={date} className="flex-1 flex flex-col items-center gap-1">
+                <div className="w-full flex flex-col justify-end" style={{ height: 60 }}>
+                  <div
+                    className="w-full rounded-t-sm transition-all duration-500"
+                    style={{
+                      height: `${heightPct}%`,
+                      backgroundColor: isMax ? '#8b5cf6' : 'rgba(139,92,246,0.3)',
+                      minHeight: 2,
+                    }}
+                  />
+                </div>
+                <span className="text-white/30 text-[9px]">{dayLabel(date)}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Insight tip */}
+      <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl px-3.5 py-2.5">
+        <p className="text-white/70 text-xs leading-relaxed">{insightTip(data)}</p>
+      </div>
+
+      {/* Full analytics link */}
+      <Link
+        href={`/dashboard/analytics/${slug}`}
+        className="block text-center text-purple-400 hover:text-purple-300 text-xs transition-colors py-1"
+      >
+        View Full Analytics →
+      </Link>
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const { user, loading, signOut } = useAuth();
@@ -231,6 +376,7 @@ function BusinessCard({
 }) {
   const { lang } = useLanguage();
   const catText = t[lang].create.categories;
+  const [statsOpen, setStatsOpen] = useState(false);
 
   const publishedDate = b.publishedAt
     ? new Date(b.publishedAt).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US', {
@@ -315,6 +461,39 @@ function BusinessCard({
           </motion.button>
         </div>
       </div>
+
+      {/* Stats toggle */}
+      {b.slug && b.publishedAt && (
+        <>
+          <button
+            onClick={() => setStatsOpen((v) => !v)}
+            className="flex items-center justify-between px-5 py-2.5 border-t border-white/5 hover:bg-white/[0.03] transition-colors text-xs font-medium text-white/40 hover:text-white/60 w-full text-left"
+          >
+            <span>📊 Stats</span>
+            <motion.span
+              animate={{ rotate: statsOpen ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+              className="text-[10px]"
+            >
+              ▼
+            </motion.span>
+          </button>
+
+          <AnimatePresence>
+            {statsOpen && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeInOut' }}
+                className="overflow-hidden border-t border-white/5"
+              >
+                <AnalyticsPanel slug={b.slug} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </>
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { BusinessData, OpeningHours } from '@/lib/types';
+import TrackedLink from '@/components/TrackedLink';
 
 const ORANGE = '#f97316';
 
@@ -103,7 +104,9 @@ export default function GymContact({ business }: Props) {
             <div className="w-full p-10 text-center" style={{ border: `2px solid ${ORANGE}30`, backgroundColor: '#0a0a0a' }}>
               <p className="font-oswald text-4xl font-bold text-white uppercase mb-2">Ready to<br />Start?</p>
               <p className="text-gray-500 text-sm mb-8">{business.description.slice(0, 100)}…</p>
-              <a
+              <TrackedLink
+                slug={business.slug}
+                type="whatsapp"
                 href={waLink}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -111,7 +114,7 @@ export default function GymContact({ business }: Props) {
                 style={{ backgroundColor: ORANGE }}
               >
                 JOIN NOW →
-              </a>
+              </TrackedLink>
             </div>
           </motion.div>
         </div>

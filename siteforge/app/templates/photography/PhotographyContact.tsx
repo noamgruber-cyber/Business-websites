@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { BusinessData } from '@/lib/types';
+import TrackedLink from '@/components/TrackedLink';
 
 type Props = { business: BusinessData };
 
@@ -47,22 +48,26 @@ export default function PhotographyContact({ business }: Props) {
               </a>
             )}
             {business.phone && (
-              <a
+              <TrackedLink
+                slug={business.slug}
+                type="phone"
                 href={`tel:${business.phone}`}
                 className="font-dm-sans text-white/60 hover:text-white text-sm underline underline-offset-4 transition-colors"
               >
                 {business.phone}
-              </a>
+              </TrackedLink>
             )}
             {igLink && (
-              <a
+              <TrackedLink
+                slug={business.slug}
+                type="instagram"
                 href={igLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-dm-sans text-white/60 hover:text-white text-sm underline underline-offset-4 transition-colors"
               >
                 @{business.instagram}
-              </a>
+              </TrackedLink>
             )}
             {business.address && (
               <p className="font-dm-sans text-white/30 text-xs mt-2">

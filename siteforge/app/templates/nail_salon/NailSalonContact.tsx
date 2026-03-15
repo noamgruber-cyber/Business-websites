@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { BusinessData, OpeningHours } from '@/lib/types';
+import TrackedLink from '@/components/TrackedLink';
 
 const ROSE = '#d4547a';
 
@@ -99,7 +100,9 @@ export default function NailSalonContact({ business }: Props) {
 
             <div className="flex flex-col gap-3">
               {business.whatsapp && (
-                <a
+                <TrackedLink
+                  slug={business.slug}
+                  type="whatsapp"
                   href={waLink}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -107,16 +110,18 @@ export default function NailSalonContact({ business }: Props) {
                   style={{ backgroundColor: ROSE }}
                 >
                   💬 Book on WhatsApp
-                </a>
+                </TrackedLink>
               )}
               {business.phone && (
-                <a
+                <TrackedLink
+                  slug={business.slug}
+                  type="phone"
                   href={callLink}
                   className="flex items-center justify-center gap-2 py-3.5 rounded-full font-semibold text-sm transition-all duration-200 hover:bg-pink-50"
                   style={{ border: `1.5px solid ${ROSE}`, color: ROSE }}
                 >
                   📞 Call Us
-                </a>
+                </TrackedLink>
               )}
             </div>
           </div>

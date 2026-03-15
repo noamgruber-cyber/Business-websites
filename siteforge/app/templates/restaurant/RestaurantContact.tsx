@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { BusinessData, OpeningHours } from '@/lib/types';
+import TrackedLink from '@/components/TrackedLink';
 
 const RED = '#c0392b';
 const DARK = '#2c2c2c';
@@ -99,16 +100,20 @@ export default function RestaurantContact({ business }: Props) {
 
             <div className="flex flex-col sm:flex-row gap-3">
               {business.phone && (
-                <a
+                <TrackedLink
+                  slug={business.slug}
+                  type="phone"
                   href={callLink}
                   className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm text-white transition-all duration-200 hover:brightness-90"
                   style={{ backgroundColor: DARK }}
                 >
                   📞 Call Now
-                </a>
+                </TrackedLink>
               )}
               {business.whatsapp && (
-                <a
+                <TrackedLink
+                  slug={business.slug}
+                  type="whatsapp"
                   href={waLink}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -116,7 +121,7 @@ export default function RestaurantContact({ business }: Props) {
                   style={{ backgroundColor: RED }}
                 >
                   💬 WhatsApp
-                </a>
+                </TrackedLink>
               )}
             </div>
           </div>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { getMockBusiness } from '@/lib/getMockBusiness';
 import { getBusiness } from '@/lib/firestore';
+import { recordView } from '@/lib/analytics';
 import BarbershopTemplate   from '@/app/templates/barbershop/BarbershopTemplate';
 import RestaurantTemplate   from '@/app/templates/restaurant/RestaurantTemplate';
 import NailSalonTemplate    from '@/app/templates/nail_salon/NailSalonTemplate';
@@ -46,6 +47,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default async function BusinessPage({ params }: Props) {
   const business = await loadBusiness(params.slug);
+
+  // Fire-and-forget analytics — don't slow down page load
+  recordView(params.slug).catch(() => {});
 
   // 404
   if (!business) {

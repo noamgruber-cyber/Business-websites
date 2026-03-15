@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { BusinessData, OpeningHours } from '@/lib/types';
+import TrackedLink from '@/components/TrackedLink';
 
 const GOLD = '#c8a96e';
 const BG   = '#0d0d0d';
@@ -68,7 +69,7 @@ export default function BarbershopContact({ business }: Props) {
             <div className="space-y-4">
               <ContactRow icon="📍" text={`${business.address}, ${business.city}`} />
               {business.phone && (
-                <ContactRow icon="📞" text={business.phone} href={`tel:${business.phone}`} />
+                <ContactRow icon="📞" text={business.phone} href={`tel:${business.phone}`} slug={business.slug} trackType="phone" />
               )}
               {business.email && (
                 <ContactRow icon="✉️" text={business.email} href={`mailto:${business.email}`} />
@@ -122,7 +123,9 @@ export default function BarbershopContact({ business }: Props) {
               </p>
 
               {/* Book button */}
-              <a
+              <TrackedLink
+                slug={business.slug}
+                type="whatsapp"
                 href={waLink}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -130,11 +133,13 @@ export default function BarbershopContact({ business }: Props) {
                 style={{ backgroundColor: GOLD, color: '#0d0d0d' }}
               >
                 Book on WhatsApp →
-              </a>
+              </TrackedLink>
 
               {/* Instagram link */}
               {igLink && (
-                <a
+                <TrackedLink
+                  slug={business.slug}
+                  type="instagram"
                   href={igLink}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -142,7 +147,7 @@ export default function BarbershopContact({ business }: Props) {
                   style={{ color: GOLD }}
                 >
                   @{business.instagram} on Instagram
-                </a>
+                </TrackedLink>
               )}
             </div>
           </motion.div>
@@ -156,10 +161,14 @@ function ContactRow({
   icon,
   text,
   href,
+  slug,
+  trackType,
 }: {
   icon: string;
   text: string;
   href?: string;
+  slug?: string;
+  trackType?: 'phone' | 'whatsapp' | 'instagram' | 'facebook';
 }) {
   const content = (
     <div className="flex items-start gap-3">
@@ -168,6 +177,13 @@ function ContactRow({
     </div>
   );
 
+  if (href && slug && trackType) {
+    return (
+      <TrackedLink slug={slug} type={trackType} href={href} className="block hover:opacity-80 transition-opacity">
+        {content}
+      </TrackedLink>
+    );
+  }
   if (href) {
     return (
       <a href={href} className="block hover:opacity-80 transition-opacity">
