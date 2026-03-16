@@ -3,7 +3,7 @@
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useEditorStore } from '@/lib/businessStore';
 import { getTemplatesForCategory, type TemplateConfig } from '@/lib/templateConfigs';
 import { BusinessCategory } from '@/lib/types';
@@ -13,6 +13,62 @@ const VALID_CATEGORIES = new Set<BusinessCategory>([
   'barbershop', 'restaurant', 'nail_salon', 'gym', 'cafe', 'photography',
 ]);
 
+// ── Premium Lock Modal ────────────────────────────────────────────────────────
+function PremiumModal({ onClose }: { onClose: () => void }) {
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{ backgroundColor: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
+        onClick={onClose}
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          className="relative max-w-sm w-full rounded-2xl p-8 text-center"
+          style={{ backgroundColor: '#0f0f1a', border: '1px solid rgba(139,92,246,0.3)' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 text-white/30 hover:text-white/70 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          <div className="text-4xl mb-4">⭐</div>
+          <h3 className="text-xl font-bold text-white mb-2">Business Plan Required</h3>
+          <p className="text-white/50 text-sm mb-6 leading-relaxed">
+            This premium template is available on the Business plan. Upgrade to unlock all templates, analytics, and priority support.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/pricing"
+              className="block w-full py-3 rounded-xl font-bold text-sm text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 transition-all text-center"
+            >
+              View Plans →
+            </Link>
+            <button
+              onClick={onClose}
+              className="text-white/30 hover:text-white/60 text-sm transition-colors"
+            >
+              Maybe later
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+// ── Template Visual Preview ───────────────────────────────────────────────────
 function TemplatePreview({ config }: { config: TemplateConfig }) {
   const [bg, accent, surface] = config.previewColors;
   return (
@@ -49,17 +105,11 @@ function TemplatePreview({ config }: { config: TemplateConfig }) {
       </div>
 
       {/* Fake hero */}
-      <div style={{
-        padding: '12px 10px', backgroundColor: bg,
-        borderBottom: `2px solid ${accent}50`,
-      }}>
+      <div style={{ padding: '12px 10px', backgroundColor: bg, borderBottom: `2px solid ${accent}50` }}>
         <div style={{ width: '70%', height: 10, backgroundColor: accent, borderRadius: 2, marginBottom: 6, opacity: 0.9 }} />
         <div style={{ width: '90%', height: 5, backgroundColor: accent, borderRadius: 2, marginBottom: 4, opacity: 0.3 }} />
         <div style={{ width: '60%', height: 5, backgroundColor: accent, borderRadius: 2, marginBottom: 10, opacity: 0.3 }} />
-        <div style={{
-          display: 'inline-block', backgroundColor: accent, borderRadius: 4,
-          padding: '4px 10px',
-        }}>
+        <div style={{ display: 'inline-block', backgroundColor: accent, borderRadius: 4, padding: '4px 10px' }}>
           <div style={{ width: 40, height: 5, backgroundColor: bg, borderRadius: 2, opacity: 0.8 }} />
         </div>
       </div>
@@ -76,10 +126,22 @@ function TemplatePreview({ config }: { config: TemplateConfig }) {
           </div>
         ))}
       </div>
+
+      {/* Premium dim overlay */}
+      {config.isPremium && (
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'rgba(0,0,0,0.35)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <span style={{ fontSize: 28 }}>🔒</span>
+        </div>
+      )}
     </div>
   );
 }
 
+// ── Template Card ─────────────────────────────────────────────────────────────
 function TemplateCard({
   config,
   isSelected,
@@ -104,6 +166,7 @@ function TemplateCard({
       style={{
         borderColor: isSelected ? 'rgba(139,92,246,0.6)' : 'rgba(255,255,255,0.08)',
         boxShadow: isSelected ? '0 0 0 1px rgba(139,92,246,0.4), 0 8px 32px rgba(139,92,246,0.15)' : 'none',
+        opacity: config.isPremium && !isSelected ? 0.85 : 1,
       }}
     >
       {/* Selected checkmark */}
@@ -148,6 +211,7 @@ function TemplateCard({
   );
 }
 
+// ── Main Form ─────────────────────────────────────────────────────────────────
 function TemplateGalleryForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -165,6 +229,15 @@ function TemplateGalleryForm() {
       ? businessData.templateId
       : templates[0]?.id ?? ''
   );
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+
+  const handleCardClick = (tpl: TemplateConfig) => {
+    if (tpl.isPremium) {
+      setShowPremiumModal(true);
+    } else {
+      setSelectedId(tpl.id);
+    }
+  };
 
   const handleUseDesign = () => {
     updateBusinessData({ templateId: selectedId });
@@ -182,6 +255,8 @@ function TemplateGalleryForm() {
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] px-4 py-10 flex flex-col">
+
+      {showPremiumModal && <PremiumModal onClose={() => setShowPremiumModal(false)} />}
 
       {/* Top bar */}
       <div className="max-w-5xl mx-auto w-full flex items-center justify-between mb-10">
@@ -212,9 +287,7 @@ function TemplateGalleryForm() {
       {/* Heading */}
       <div className="max-w-5xl mx-auto w-full text-center mb-12">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4">
-            {heading}
-          </h1>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4">{heading}</h1>
           <p className="text-white/45 text-base sm:text-lg">{subline}</p>
         </motion.div>
       </div>
@@ -231,7 +304,7 @@ function TemplateGalleryForm() {
             <TemplateCard
               config={tpl}
               isSelected={selectedId === tpl.id}
-              onSelect={() => setSelectedId(tpl.id)}
+              onSelect={() => handleCardClick(tpl)}
               lang={lang}
             />
           </motion.div>
