@@ -3,12 +3,15 @@ import Link from 'next/link';
 import { getMockBusiness } from '@/lib/getMockBusiness';
 import { getBusiness } from '@/lib/firestore';
 import { recordView } from '@/lib/analytics';
-import BarbershopTemplate   from '@/app/templates/barbershop/BarbershopTemplate';
-import RestaurantTemplate   from '@/app/templates/restaurant/RestaurantTemplate';
-import NailSalonTemplate    from '@/app/templates/nail_salon/NailSalonTemplate';
-import GymTemplate          from '@/app/templates/gym/GymTemplate';
-import CafeTemplate         from '@/app/templates/cafe/CafeTemplate';
-import PhotographyTemplate  from '@/app/templates/photography/PhotographyTemplate';
+import BarbershopTemplate        from '@/app/templates/barbershop/BarbershopTemplate';
+import BarbershopClassicTemplate from '@/app/templates/barbershop/BarbershopClassicTemplate';
+import BarbershopModernTemplate  from '@/app/templates/barbershop/BarbershopModernTemplate';
+import BarbershopBoldTemplate    from '@/app/templates/barbershop/BarbershopBoldTemplate';
+import RestaurantTemplate        from '@/app/templates/restaurant/RestaurantTemplate';
+import NailSalonTemplate         from '@/app/templates/nail_salon/NailSalonTemplate';
+import GymTemplate               from '@/app/templates/gym/GymTemplate';
+import CafeTemplate              from '@/app/templates/cafe/CafeTemplate';
+import PhotographyTemplate       from '@/app/templates/photography/PhotographyTemplate';
 import { BusinessData } from '@/lib/types';
 
 type Props = { params: { slug: string } };
@@ -72,15 +75,32 @@ export default async function BusinessPage({ params }: Props) {
     );
   }
 
-  // Route to the right template
-  switch (business.category) {
-    case 'barbershop':   return <BarbershopTemplate  business={business} />;
-    case 'restaurant':   return <RestaurantTemplate  business={business} />;
-    case 'nail_salon':   return <NailSalonTemplate   business={business} />;
-    case 'gym':          return <GymTemplate         business={business} />;
-    case 'cafe':         return <CafeTemplate        business={business} />;
-    case 'photography':  return <PhotographyTemplate business={business} />;
+  // Route to the right template based on templateId, with category fallback
+  const tid = business.templateId ?? business.category;
+  switch (tid) {
+    // Barbershop variants
+    case 'barbershop_classic': return <BarbershopClassicTemplate business={business} />;
+    case 'barbershop_modern':  return <BarbershopModernTemplate  business={business} />;
+    case 'barbershop_bold':    return <BarbershopBoldTemplate    business={business} />;
+    // Legacy: templateId was just the category name
+    case 'barbershop':         return <BarbershopTemplate        business={business} />;
+    // Other categories (single template each)
+    case 'restaurant':         return <RestaurantTemplate        business={business} />;
+    case 'nail_salon':         return <NailSalonTemplate         business={business} />;
+    case 'gym':                return <GymTemplate               business={business} />;
+    case 'cafe':               return <CafeTemplate              business={business} />;
+    case 'photography':        return <PhotographyTemplate       business={business} />;
     default:
+      // Fallback: route by category
+      switch (business.category) {
+        case 'barbershop':   return <BarbershopTemplate  business={business} />;
+        case 'restaurant':   return <RestaurantTemplate  business={business} />;
+        case 'nail_salon':   return <NailSalonTemplate   business={business} />;
+        case 'gym':          return <GymTemplate         business={business} />;
+        case 'cafe':         return <CafeTemplate        business={business} />;
+        case 'photography':  return <PhotographyTemplate business={business} />;
+      }
+      /* falls through */
       return (
         <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4">
           <div className="text-center">

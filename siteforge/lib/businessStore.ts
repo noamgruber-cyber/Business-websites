@@ -135,7 +135,7 @@ export const useEditorStore = create<EditorStore>((set) => ({
         ...EMPTY_BUSINESS,
         id,
         category,
-        templateId: category,
+        templateId: `${category}_classic`,
         services:   getDefaultServices(category, lang),
         createdAt:  new Date().toISOString(),
       },

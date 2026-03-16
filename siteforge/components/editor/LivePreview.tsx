@@ -1,7 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useEditorStore } from '@/lib/businessStore';
 import { BusinessCategory, CATEGORY_COLORS } from '@/lib/types';
+import { getTemplateConfig } from '@/lib/templateConfigs';
 
 // Re-export-safe label map
 const CAT_LABELS: Record<BusinessCategory, string> = {
@@ -21,9 +23,13 @@ function fmtHours(value: string): string {
 export default function LivePreview() {
   const { businessData, currentStep } = useEditorStore();
   const colors = CATEGORY_COLORS[businessData.category] ?? CATEGORY_COLORS.barbershop;
+  const templateConfig = getTemplateConfig(businessData.templateId ?? '');
 
   const displayName = businessData.businessName.trim() || 'Your Business Name';
   const galleryFilled = businessData.galleryPhotos.filter(Boolean);
+
+  // Use template's bgColor if available
+  const previewBg = templateConfig?.bgColor ?? colors.bg;
 
   return (
     <div className="sticky top-24 select-none">
@@ -38,6 +44,21 @@ export default function LivePreview() {
           {CAT_LABELS[businessData.category]}
         </span>
       </div>
+
+      {/* Template info bar */}
+      {templateConfig && (
+        <div className="flex items-center justify-between mb-3 px-1">
+          <span className="text-xs text-white/30">
+            Previewing: <span className="text-white/55 font-medium">{templateConfig.name}</span>
+          </span>
+          <Link
+            href={`/templates/${businessData.category}${businessData.id ? `?id=${businessData.id}` : ''}`}
+            className="text-[11px] text-purple-400 hover:text-purple-300 transition-colors font-medium"
+          >
+            Change Design →
+          </Link>
+        </div>
+      )}
 
       {/* Outer clipping container */}
       <div
@@ -69,7 +90,7 @@ export default function LivePreview() {
           </div>
 
           {/* ── Website Content ── */}
-          <div style={{ background: colors.bg, minHeight: 800, fontFamily: 'Inter, system-ui, sans-serif' }}>
+          <div style={{ background: previewBg, minHeight: 800, fontFamily: 'Inter, system-ui, sans-serif' }}>
 
             {/* Navbar */}
             <div style={{

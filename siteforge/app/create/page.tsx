@@ -44,7 +44,7 @@ function CreateForm() {
     if (!selected) return;
     const id = crypto.randomUUID();
     initBusiness(id, selected, lang);
-    router.push(`/edit/${id}`);
+    router.push(`/templates/${selected}?id=${id}`);
   };
 
   return (
