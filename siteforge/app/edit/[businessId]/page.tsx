@@ -158,6 +158,30 @@ export default function EditPage({ params }: Props) {
         </aside>
       </div>
 
+      {/* ── Mobile: sticky bottom step navigation bar ── */}
+      <div className="sticky bottom-0 z-10 bg-gray-900 border-t border-gray-800 p-4 flex gap-3 md:hidden">
+        <button
+          onClick={() => canGoBack && navigate(-1)}
+          disabled={!canGoBack}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 text-white/60 text-sm font-medium transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          <svg className="w-4 h-4 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          {text.back}
+        </button>
+        <button
+          onClick={() => canGoNext && navigate(1)}
+          disabled={!canGoNext}
+          className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-bold transition-all duration-200 disabled:opacity-35 disabled:cursor-not-allowed"
+        >
+          {currentStep === 4 ? text.reviewPublish : text.next}
+          <svg className="w-4 h-4 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
       {/* ── Mobile: floating Preview button ── */}
       <button
         onClick={() => setPreviewOpen(true)}

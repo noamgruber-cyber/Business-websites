@@ -42,7 +42,7 @@ export default function CafeMenu({ business }: Props) {
           className="text-center mb-14"
         >
           <h2 className="font-lora text-5xl sm:text-6xl font-bold" style={{ color: BROWN }}>
-            What We're Brewing
+            What We&apos;re Brewing
           </h2>
           {/* Ornament */}
           <div className="flex items-center justify-center gap-3 mt-5">

@@ -46,11 +46,17 @@ export async function updateBusiness(
   await updateDoc(ref, { ...updates, savedAt: new Date().toISOString() });
 }
 
-// ── Check if a slug is available ─────────────────────────────────────────────
-export async function checkSlugAvailable(slug: string): Promise<boolean> {
+// ── Check if a slug is available (optionally excluding the current business id) ─
+export async function checkSlugAvailable(
+  slug: string,
+  excludeId?: string,
+): Promise<boolean> {
   const ref  = doc(db, COL, slug);
   const snap = await getDoc(ref);
-  return !snap.exists();
+  if (!snap.exists()) return true;
+  // If the existing doc belongs to the same business being edited, it's still available
+  if (excludeId && snap.data()?.id === excludeId) return true;
+  return false;
 }
 
 // ── Delete a business by slug ─────────────────────────────────────────────────

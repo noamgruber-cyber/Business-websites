@@ -119,7 +119,7 @@ export default function BarbershopContact({ business }: Props) {
                 Ready for a fresh cut?
               </h3>
               <p className="text-white/50 text-sm leading-relaxed mb-8 max-w-xs">
-                Book your appointment on WhatsApp — we'll confirm within minutes.
+                Book your appointment on WhatsApp — we&apos;ll confirm within minutes.
               </p>
 
               {/* Book button */}

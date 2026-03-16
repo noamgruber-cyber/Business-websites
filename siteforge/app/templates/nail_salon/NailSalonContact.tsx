@@ -95,7 +95,7 @@ export default function NailSalonContact({ business }: Props) {
               Book Your Appointment
             </h3>
             <p className="text-sm text-gray-400 leading-relaxed mb-8">
-              Reach us on WhatsApp or give us a call — we'd love to pamper you.
+              Reach us on WhatsApp or give us a call — we&apos;d love to pamper you.
             </p>
 
             <div className="flex flex-col gap-3">

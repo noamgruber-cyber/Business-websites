@@ -177,6 +177,7 @@ export default function DashboardPage() {
 
   const [businesses, setBusinesses]       = useState<BusinessData[]>([]);
   const [fetching, setFetching]           = useState(true);
+  const [fetchError, setFetchError]       = useState(false);
   const [deleteTarget, setDeleteTarget]   = useState<BusinessData | null>(null);
   const [deleting, setDeleting]           = useState(false);
 
@@ -184,13 +185,22 @@ export default function DashboardPage() {
     if (!loading && !user) router.replace('/login?redirect=/dashboard');
   }, [user, loading, router]);
 
-  useEffect(() => {
+  const loadBusinesses = useCallback(() => {
     if (!user) return;
+    setFetching(true);
+    setFetchError(false);
     getBusinessesByUser(user.uid)
       .then(setBusinesses)
-      .catch(console.error)
+      .catch((err) => {
+        console.error('[dashboard] Failed to load businesses', err);
+        setFetchError(true);
+      })
       .finally(() => setFetching(false));
   }, [user]);
+
+  useEffect(() => {
+    loadBusinesses();
+  }, [loadBusinesses]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -287,10 +297,25 @@ export default function DashboardPage() {
           </Link>
         </motion.div>
 
+        {/* ── Fetch error banner ── */}
+        {fetchError && !fetching && (
+          <div className="mb-6 flex items-center justify-between gap-4 rounded-2xl border border-red-500/30 bg-red-500/10 px-5 py-4">
+            <p className="text-red-400 text-sm">
+              Failed to load your websites. Please check your connection and try again.
+            </p>
+            <button
+              onClick={loadBusinesses}
+              className="flex-shrink-0 rounded-lg border border-red-500/40 px-4 py-1.5 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
         {/* ── Content ── */}
         {fetching ? (
           <SkeletonDashboardGrid />
-        ) : businesses.length === 0 ? (
+        ) : fetchError ? null : businesses.length === 0 ? (
           <EmptyState text={text} />
         ) : (
           <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

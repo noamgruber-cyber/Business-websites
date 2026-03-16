@@ -95,7 +95,7 @@ export default function RestaurantContact({ business }: Props) {
               Join us for a meal
             </h3>
             <p className="text-sm leading-relaxed mb-8" style={{ color: '#777' }}>
-              Call us or send a WhatsApp message to reserve your table. We'd love to have you.
+              Call us or send a WhatsApp message to reserve your table. We&apos;d love to have you.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">

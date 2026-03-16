@@ -15,10 +15,14 @@ export default function GymHero({ business }: Props) {
 
   return (
     <section id="hero" className="relative h-screen flex flex-col justify-center overflow-hidden">
-      {/* Background */}
+      {/* Background (gradient fallback if no cover photo) */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${business.coverPhotoUrl})` }}
+        style={{
+          backgroundImage: business.coverPhotoUrl
+            ? `url(${business.coverPhotoUrl})`
+            : 'linear-gradient(135deg, #050a1a 0%, #0a1535 50%, #040810 100%)',
+        }}
       />
       <div className="absolute inset-0 bg-black/75" />
 

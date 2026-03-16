@@ -19,11 +19,15 @@ export default function BarbershopHero({ business }: Props) {
       id="hero"
       className="relative h-screen flex flex-col justify-between overflow-hidden"
     >
-      {/* Background image with Ken Burns zoom */}
+      {/* Background image with Ken Burns zoom (gradient fallback if no cover photo) */}
       <div className="absolute inset-0 overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center ken-burns"
-          style={{ backgroundImage: `url(${business.coverPhotoUrl})` }}
+          style={{
+            backgroundImage: business.coverPhotoUrl
+              ? `url(${business.coverPhotoUrl})`
+              : 'linear-gradient(135deg, #1a0a00 0%, #3d1a00 50%, #0d0d0d 100%)',
+          }}
         />
       </div>
       {/* Dark overlay */}

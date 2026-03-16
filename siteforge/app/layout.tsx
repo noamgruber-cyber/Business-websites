@@ -4,6 +4,7 @@ import { ViewTransitions } from 'next-view-transitions';
 import { AuthProvider } from '@/context/AuthContext';
 import { LanguageProvider } from '@/context/LanguageContext';
 import CustomCursor from '@/components/ui/CustomCursor';
+import ScrollToTop from '@/components/ui/ScrollToTop';
 
 const DESCRIPTION =
   'The easiest way for small businesses to get online. Create a professional website for your barbershop, restaurant, or salon in minutes. No coding required.';
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <body className="antialiased">
           <LanguageProvider>
             <AuthProvider>
+              <ScrollToTop />
               <CustomCursor />
               {children}
             </AuthProvider>

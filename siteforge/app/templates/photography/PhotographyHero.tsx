@@ -8,10 +8,14 @@ type Props = { business: BusinessData };
 export default function PhotographyHero({ business }: Props) {
   return (
     <section id="hero" className="relative h-screen overflow-hidden">
-      {/* Ken Burns slow zoom */}
+      {/* Ken Burns slow zoom (gradient fallback if no cover photo) */}
       <motion.div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${business.coverPhotoUrl})` }}
+        style={{
+          backgroundImage: business.coverPhotoUrl
+            ? `url(${business.coverPhotoUrl})`
+            : 'linear-gradient(135deg, #111827 0%, #1f2937 50%, #0f172a 100%)',
+        }}
         initial={{ scale: 1 }}
         animate={{ scale: 1.06 }}
         transition={{ duration: 14, ease: 'linear', repeat: Infinity, repeatType: 'reverse' }}

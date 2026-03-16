@@ -40,12 +40,17 @@ import { BusinessData } from '@/lib/types';
 type Props = { params: { slug: string } };
 
 // ── Load business: Firestore first, fallback to mock for demo slugs ──────────
-async function loadBusiness(slug: string): Promise<BusinessData | null> {
+async function loadBusiness(slug: string): Promise<BusinessData | null | 'offline'> {
   try {
     const live = await getBusiness(slug);
     if (live) return live;
-  } catch {
-    // Firestore unavailable in build/dev — fall through to mock
+  } catch (err) {
+    // Firestore unavailable — fall through to mock only if it's a known demo slug
+    const mock = getMockBusiness(slug);
+    if (mock) return mock;
+    // Real slug but Firestore failed — signal offline
+    console.error('[loadBusiness] Firestore error', err);
+    return 'offline';
   }
   return getMockBusiness(slug);
 }
@@ -53,7 +58,7 @@ async function loadBusiness(slug: string): Promise<BusinessData | null> {
 // ── SEO Metadata ──────────────────────────────────────────────────────────────
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const business = await loadBusiness(params.slug);
-  if (!business) return { title: 'Business Not Found — SiteForge' };
+  if (!business || business === 'offline') return { title: 'Business Not Found — SiteForge' };
 
   const desc = `${business.tagline} ${business.description}`.slice(0, 155);
   return {
@@ -74,15 +79,39 @@ export default async function BusinessPage({ params }: Props) {
   // Fire-and-forget analytics — don't slow down page load
   recordView(params.slug).catch(() => {});
 
+  // Firestore offline / unavailable
+  if (business === 'offline') {
+    return (
+      <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <div className="text-6xl mb-5">🔌</div>
+          <h1 className="text-2xl font-black text-white mb-3">האתר זמנית לא זמין</h1>
+          <p className="text-white/50 text-base mb-2">
+            האתר זמנית לא זמין, נסה שוב בעוד כמה דקות
+          </p>
+          <p className="text-white/30 text-sm mb-8">
+            The site is temporarily unavailable. Please try again in a few minutes.
+          </p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold text-sm hover:from-purple-500 hover:to-blue-500 transition-all"
+          >
+            ← Back to SiteForge
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
   // 404
   if (!business) {
     return (
       <main className="min-h-screen bg-[#0a0a0f] flex items-center justify-center px-4">
         <div className="text-center">
           <h1 className="text-8xl sm:text-9xl font-black mb-4 gradient-text leading-none">404</h1>
-          <p className="text-white/60 text-xl mb-2">We couldn't find this business</p>
+          <p className="text-white/60 text-xl mb-2">We couldn&apos;t find this business</p>
           <p className="text-white/30 text-sm mb-10">
-            The link might be wrong, or this business hasn't published yet.
+            The link might be wrong, or this business hasn&apos;t published yet.
           </p>
           <Link
             href="/"

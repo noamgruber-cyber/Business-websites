@@ -23,7 +23,7 @@ export default function PhotographyContact({ business }: Props) {
           viewport={{ once: true }}
           className="font-dm-sans text-3xl sm:text-4xl italic text-white/80 leading-relaxed mb-16 text-center"
         >
-          "Every moment deserves to be remembered."
+          &ldquo;Every moment deserves to be remembered.&rdquo;
         </motion.p>
 
         <motion.div

@@ -78,10 +78,14 @@ export default function RestaurantHero({ business }: Props) {
         id="hero"
         className="relative h-screen flex flex-col justify-end overflow-hidden"
       >
-        {/* Cover photo */}
+        {/* Cover photo (gradient fallback if no cover photo) */}
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${business.coverPhotoUrl})` }}
+          style={{
+            backgroundImage: business.coverPhotoUrl
+              ? `url(${business.coverPhotoUrl})`
+              : 'linear-gradient(135deg, #1a0800 0%, #4a1500 50%, #0d0505 100%)',
+          }}
         />
         {/* Warm gradient overlay from bottom */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-black/20" />

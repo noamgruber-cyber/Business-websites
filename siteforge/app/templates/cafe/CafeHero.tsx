@@ -23,10 +23,14 @@ export default function CafeHero({ business }: Props) {
 
   return (
     <section id="hero" className="relative h-screen flex flex-col justify-center items-center overflow-hidden">
-      {/* Background */}
+      {/* Background (gradient fallback if no cover photo) */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${business.coverPhotoUrl})` }}
+        style={{
+          backgroundImage: business.coverPhotoUrl
+            ? `url(${business.coverPhotoUrl})`
+            : 'linear-gradient(135deg, #1a1005 0%, #3d2a00 50%, #1a0e00 100%)',
+        }}
       />
       {/* Warm gradient overlay from bottom */}
       <div className="absolute inset-0" style={{ background: `linear-gradient(to top, ${BROWN}cc 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0.25) 100%)` }} />

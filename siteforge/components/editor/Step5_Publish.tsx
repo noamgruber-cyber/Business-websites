@@ -15,14 +15,24 @@ const CATEGORY_LABELS: Record<string, string> = {
   photography: '📸 Photography',
 };
 
-function generateSlug(value: string): string {
-  return value
+function generateSlug(value: string, category?: string): string {
+  // Replace Hebrew/non-ASCII chars — if the whole string would be empty after stripping,
+  // fall back to category + timestamp
+  const stripped = value
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-{2,}/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/[\u0590-\u05FF\u05B0-\u05C7]/g, '') // strip Hebrew characters
+    .replace(/[^a-z0-9\s-]/g, '')                  // remove remaining special chars
+    .replace(/\s+/g, '-')                           // spaces → dashes
+    .replace(/-{2,}/g, '-')                         // collapse multiple dashes
+    .replace(/^-|-$/g, '');                         // trim leading/trailing dashes
+
+  if (!stripped) {
+    // Fallback: category-timestamp
+    const base = (category ?? 'business').replace(/_/g, '-');
+    return `${base}-${Date.now().toString(36)}`;
+  }
+  return stripped;
 }
 
 function validateSlug(slug: string): string | null {
@@ -37,14 +47,14 @@ type PublishState = 'idle' | 'checking' | 'saving' | 'done' | 'error';
 export default function Step5_Publish() {
   const router = useRouter();
   const { user } = useAuth();
-  const { businessData, updateBusinessData, setStep } = useEditorStore();
+  const { businessData, updateBusinessData, setStep, reset } = useEditorStore();
 
   const [slugError, setSlugError]     = useState<string | null>(null);
   const [publishState, setPublishState] = useState<PublishState>('idle');
   const [publishError, setPublishError] = useState<string | null>(null);
 
   const handleSlugChange = (value: string) => {
-    const slug = generateSlug(value);
+    const slug = generateSlug(value, businessData.category);
     updateBusinessData({ slug });
     setSlugError(validateSlug(slug));
     setPublishError(null);
@@ -57,11 +67,11 @@ export default function Step5_Publish() {
     setPublishError(null);
 
     try {
-      // 1 — Check slug availability
+      // 1 — Check slug availability (exclude current business if re-publishing)
       setPublishState('checking');
-      const available = await checkSlugAvailable(businessData.slug);
+      const available = await checkSlugAvailable(businessData.slug, businessData.id || undefined);
       if (!available) {
-        setSlugError('This URL is already taken, please choose another.');
+        setSlugError('הכתובת הזו כבר תפוסה, נסה כתובת אחרת');
         setPublishState('idle');
         return;
       }
@@ -79,9 +89,11 @@ export default function Step5_Publish() {
       await saveBusiness(publishedData);
       updateBusinessData({ publishedAt: publishedData.publishedAt });
 
-      // 3 — Navigate
+      // 3 — Navigate and reset store
       setPublishState('done');
-      router.push(`/b/${businessData.slug}`);
+      const publishedSlug = businessData.slug;
+      reset();
+      router.push(`/b/${publishedSlug}`);
     } catch (err) {
       console.error('[publish]', err);
       setPublishError('Something went wrong. Please try again.');

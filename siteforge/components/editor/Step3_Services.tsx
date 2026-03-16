@@ -122,14 +122,19 @@ export default function Step3_Services() {
 
       <AnimatePresence>
         {businessData.services.length === 0 && (
-          <motion.p
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="text-center text-white/25 text-sm py-4"
+            className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 px-4 py-3 text-center"
           >
-            No services yet — click &quot;Add Service&quot; to get started
-          </motion.p>
+            <p className="text-yellow-400 text-sm font-medium">
+              הוסף לפחות שירות אחד כדי שהסקשן יוצג
+            </p>
+            <p className="text-yellow-400/50 text-xs mt-1">
+              Add at least one service for the services section to appear on your site
+            </p>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

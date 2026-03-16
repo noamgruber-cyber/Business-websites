@@ -40,7 +40,7 @@ export default function ImageUploadBox({
       onChange(url);
     } catch (err) {
       console.error('[ImageUploadBox]', err);
-      setError('Upload failed, please try again.');
+      setError('ההעלאה נכשלה, נסה שוב');
     } finally {
       setUploading(false);
     }
