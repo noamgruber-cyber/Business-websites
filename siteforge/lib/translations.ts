@@ -337,6 +337,19 @@ export const t = {
       email:          'hello@siteforge.co.il',
     },
 
+    // ── Common ───────────────────────────────────────────────────────────────
+    common: {
+      poweredBy: '⚡ נבנה עם SiteForge',
+      loading: 'טוען...',
+      error: 'משהו השתבש',
+      tryAgain: 'נסה שוב',
+      cancel: 'ביטול',
+      confirm: 'אישור',
+      save: 'שמור',
+      delete: 'מחק',
+      close: 'סגור',
+    },
+
     // ── Footer ───────────────────────────────────────────────────────────────
     footerNew: {
       newsletter: {
@@ -730,6 +743,19 @@ export const t = {
       address:        'Tel Aviv, Israel 🇮🇱',
       hours:          'Sun–Thu: 9:00–18:00',
       email:          'hello@siteforge.co.il',
+    },
+
+    // ── Common ───────────────────────────────────────────────────────────────
+    common: {
+      poweredBy: '⚡ Made with SiteForge',
+      loading: 'Loading...',
+      error: 'Something went wrong',
+      tryAgain: 'Try again',
+      cancel: 'Cancel',
+      confirm: 'Confirm',
+      save: 'Save',
+      delete: 'Delete',
+      close: 'Close',
     },
 
     // ── Footer (new complete structure) ──────────────────────────────────────
