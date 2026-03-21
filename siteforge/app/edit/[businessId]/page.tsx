@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import { useEditorStore } from '@/lib/businessStore';
 import { useLanguage } from '@/context/LanguageContext';
-import { t } from '@/lib/translations';
+import { getT } from '@/lib/translations';
 import StepIndicator from '@/components/editor/StepIndicator';
 import Step1_BasicInfo from '@/components/editor/Step1_BasicInfo';
 import Step2_Photos from '@/components/editor/Step2_Photos';
@@ -31,7 +31,7 @@ export default function EditPage({ params }: Props) {
   const router = useRouter();
   const { businessData, currentStep, setStep } = useEditorStore();
   const { lang } = useLanguage();
-  const text = t[lang].editor;
+  const text = getT(lang).editor;
 
   // Wait for client hydration before checking store
   const [mounted, setMounted] = useState(false);

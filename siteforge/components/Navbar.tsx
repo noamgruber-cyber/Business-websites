@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { t } from "@/lib/translations";
+import { getT } from "@/lib/translations";
 
 /**
  * Navbar — Logo | Features · Templates · Pricing · More ▼ | Lang + CTA
@@ -19,7 +19,7 @@ export default function Navbar() {
   const moreRef = useRef<HTMLDivElement>(null);
   const { user, loading } = useAuth();
   const { lang, toggleLang } = useLanguage();
-  const text = t[lang].nav;
+  const text = getT(lang).nav;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);

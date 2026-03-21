@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
-import { t } from "@/lib/translations";
+import { getT } from "@/lib/translations";
 
 /**
  * HeroSection — Full-viewport hero with animated gradient orbs,
@@ -13,7 +13,7 @@ import { t } from "@/lib/translations";
 export default function HeroSection() {
   const { user } = useAuth();
   const { lang } = useLanguage();
-  const text = t[lang].hero;
+  const text = getT(lang).hero;
   const ctaHref = user ? '/create' : '/login';
 
   // Split headline into words for staggered reveal

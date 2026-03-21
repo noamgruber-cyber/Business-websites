@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { t } from "@/lib/translations";
+import { getT } from "@/lib/translations";
 
 /**
  * HowItWorks — 3-step process section with glassmorphism cards.
@@ -14,7 +14,7 @@ const STEP_NUMBERS = ["01", "02", "03"];
 
 export default function HowItWorks() {
   const { lang } = useLanguage();
-  const text = t[lang].howItWorks;
+  const text = getT(lang).howItWorks;
 
   return (
     <section id="how-it-works" className="relative py-24 px-4 sm:px-6 lg:px-8">

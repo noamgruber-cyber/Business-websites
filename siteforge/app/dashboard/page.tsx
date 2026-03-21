@@ -10,7 +10,7 @@ import { getAnalytics, type AnalyticsData } from '@/lib/analytics';
 import { BusinessData } from '@/lib/types';
 import { useEditorStore } from '@/lib/businessStore';
 import { useLanguage } from '@/context/LanguageContext';
-import { t, type Translations } from '@/lib/translations';
+import { getT, type Translations } from '@/lib/translations';
 import { SkeletonDashboardGrid } from '@/components/ui/Skeleton';
 
 type DashboardText = Translations['en']['dashboard'] | Translations['he']['dashboard'];
@@ -173,7 +173,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const { loadBusiness } = useEditorStore();
   const { lang } = useLanguage();
-  const text = t[lang].dashboard;
+  const text = getT(lang).dashboard;
 
   const [businesses, setBusinesses]       = useState<BusinessData[]>([]);
   const [fetching, setFetching]           = useState(true);
@@ -400,7 +400,7 @@ function BusinessCard({
   onDelete: () => void;
 }) {
   const { lang } = useLanguage();
-  const catText = t[lang].create.categories;
+  const catText = getT(lang).create.categories;
   const [statsOpen, setStatsOpen] = useState(false);
 
   const publishedDate = b.publishedAt

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useEditorStore } from '@/lib/businessStore';
 import { BusinessCategory } from '@/lib/types';
 import { useLanguage } from '@/context/LanguageContext';
-import { t } from '@/lib/translations';
+import { getT } from '@/lib/translations';
 
 const VALID_CATEGORIES = new Set<BusinessCategory>([
   'barbershop', 'restaurant', 'nail_salon', 'gym', 'cafe', 'photography',
@@ -29,7 +29,7 @@ function CreateForm() {
   const searchParams = useSearchParams();
   const { initBusiness } = useEditorStore();
   const { lang } = useLanguage();
-  const text = t[lang].create;
+  const text = getT(lang).create;
 
   const paramCategory = searchParams.get('category') as BusinessCategory | null;
   const initialCategory = paramCategory && VALID_CATEGORIES.has(paramCategory) ? paramCategory : null;

@@ -4,6 +4,9 @@ import { getMockBusiness } from '@/lib/getMockBusiness';
 import { getBusiness } from '@/lib/firestore';
 import { recordView } from '@/lib/analytics';
 
+// Always render dynamically — fetches live business data from Firestore
+export const dynamic = 'force-dynamic';
+
 // ── Barbershop ────────────────────────────────────────────────────────────────
 import BarbershopTemplate        from '@/app/templates/barbershop/BarbershopTemplate';
 import BarbershopClassicTemplate from '@/app/templates/barbershop/BarbershopClassicTemplate';

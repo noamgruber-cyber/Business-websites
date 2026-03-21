@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { t } from '@/lib/translations';
+import { getT } from '@/lib/translations';
 
 function LoginForm() {
   const { user, loading, signInWithGoogle } = useAuth();
@@ -13,7 +13,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const redirect     = searchParams.get('redirect') || '/dashboard';
   const { lang } = useLanguage();
-  const text = t[lang].login;
+  const text = getT(lang).login;
 
   const [signingIn, setSigningIn] = useState(false);
   const [error, setError]         = useState<string | null>(null);

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
-import { t } from "@/lib/translations";
+import { getT } from "@/lib/translations";
 
 // ── Social icon SVGs ──────────────────────────────────────────────────────────
 const SocialIcons = {
@@ -47,8 +47,8 @@ const socialLinks = [
 
 export default function Footer() {
   const { lang, toggleLang } = useLanguage();
-  const text = t[lang].footerNew;
-  const navText = t[lang].nav;
+  const text = getT(lang).footerNew;
+  const navText = getT(lang).nav;
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 

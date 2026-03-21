@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
-import { t } from "@/lib/translations";
+import { getT } from "@/lib/translations";
 
 // ── Counted stat that animates when in view ───────────────────────────────────
 function StatCard({ value, label, delay }: { value: string; label: string; delay: number }) {
@@ -27,7 +27,7 @@ function StatCard({ value, label, delay }: { value: string; label: string; delay
 
 export default function AboutPage() {
   const { lang } = useLanguage();
-  const text = t[lang].about;
+  const text = getT(lang).about;
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] text-white pt-16">

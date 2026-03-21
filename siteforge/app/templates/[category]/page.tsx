@@ -151,7 +151,7 @@ function TemplateCard({
   config: TemplateConfig;
   isSelected: boolean;
   onSelect: () => void;
-  lang: 'he' | 'en';
+  lang: string;
 }) {
   const name = lang === 'he' ? config.nameHe : config.name;
   const description = lang === 'he' ? config.descriptionHe : config.description;

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { t } from "@/lib/translations";
+import { getT } from "@/lib/translations";
 
 /**
  * Testimonials — Social proof section with 3D tilt cards and star stagger.
@@ -84,7 +84,7 @@ function TiltCard({ children, delay }: { children: React.ReactNode; delay: numbe
 
 export default function Testimonials() {
   const { lang } = useLanguage();
-  const text = t[lang].testimonials;
+  const text = getT(lang).testimonials;
 
   return (
     <section className="relative py-24 px-4 sm:px-6 lg:px-8">

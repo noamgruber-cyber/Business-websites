@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { t } from "@/lib/translations";
+import { getT } from "@/lib/translations";
 
 // ── Animated SVG Checkmark ────────────────────────────────────────────────────
 function AnimatedCheckmark() {
@@ -127,7 +127,7 @@ function MapPlaceholder() {
 // ── Main Contact Page ─────────────────────────────────────────────────────────
 export default function ContactPage() {
   const { lang } = useLanguage();
-  const text = t[lang].contact;
+  const text = getT(lang).contact;
 
   // Form state
   const [name, setName]         = useState("");

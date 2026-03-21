@@ -15,7 +15,7 @@ import Footer from '@/components/Footer';
 
 const CATEGORIES = Object.keys(CATEGORY_META) as HelpArticle['category'][];
 
-function ArticleCard({ article, lang }: { article: HelpArticle; lang: 'he' | 'en' }) {
+function ArticleCard({ article, lang }: { article: HelpArticle; lang: string }) {
   const meta = CATEGORY_META[article.category];
   const title = lang === 'he' ? article.titleHe : article.title;
   const excerpt = (lang === 'he' ? article.contentHe : article.content)

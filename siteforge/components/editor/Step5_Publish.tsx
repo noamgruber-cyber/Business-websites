@@ -60,6 +60,8 @@ export default function Step5_Publish() {
     setPublishError(null);
   };
 
+  const isEditing = Boolean(businessData.publishedAt);
+
   const handlePublish = async () => {
     const validationErr = validateSlug(businessData.slug);
     if (validationErr) { setSlugError(validationErr); return; }
@@ -80,7 +82,7 @@ export default function Step5_Publish() {
       setPublishState('saving');
       const publishedData = {
         ...businessData,
-        publishedAt:   new Date().toISOString(),
+        publishedAt:   businessData.publishedAt ?? new Date().toISOString(),
         ownerUid:      user?.uid          ?? '',
         ownerEmail:    user?.email        ?? '',
         ownerName:     user?.displayName  ?? '',
@@ -89,11 +91,10 @@ export default function Step5_Publish() {
       await saveBusiness(publishedData);
       updateBusinessData({ publishedAt: publishedData.publishedAt });
 
-      // 3 — Navigate and reset store
+      // 3 — Navigate and reset store — always go to dashboard
       setPublishState('done');
-      const publishedSlug = businessData.slug;
       reset();
-      router.push(`/b/${publishedSlug}`);
+      router.push('/dashboard');
     } catch (err) {
       console.error('[publish]', err);
       setPublishError('Something went wrong. Please try again.');
@@ -104,12 +105,13 @@ export default function Step5_Publish() {
   const slugValid  = !slugError && businessData.slug.length >= 3;
   const isWorking  = publishState === 'checking' || publishState === 'saving';
 
+  const idleLabel  = isEditing ? '💾 שמור שינויים' : '🚀 Publish My Website';
   const statusText: Record<PublishState, string> = {
-    idle:     '🚀 Publish My Website',
+    idle:     idleLabel,
     checking: 'Checking URL…',
-    saving:   'Publishing your website…',
-    done:     '✅ Published!',
-    error:    '🚀 Publish My Website',
+    saving:   isEditing ? 'Saving changes…' : 'Publishing your website…',
+    done:     isEditing ? '✅ Saved!' : '✅ Published!',
+    error:    idleLabel,
   };
 
   return (
@@ -129,9 +131,13 @@ export default function Step5_Publish() {
 
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="text-6xl mb-4">🚀</div>
-          <h1 className="text-4xl font-black text-white mb-3">Ready to Go Live?</h1>
-          <p className="text-white/45 text-base">Review your details and publish your website</p>
+          <div className="text-6xl mb-4">{isEditing ? '💾' : '🚀'}</div>
+          <h1 className="text-4xl font-black text-white mb-3">
+            {isEditing ? 'שמור שינויים' : 'Ready to Go Live?'}
+          </h1>
+          <p className="text-white/45 text-base">
+            {isEditing ? 'Review your changes and save' : 'Review your details and publish your website'}
+          </p>
         </div>
 
         {/* Summary Card */}

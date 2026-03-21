@@ -819,3 +819,15 @@ export const t = {
 
 export type Translations = typeof t;
 export type LangText = typeof t['en'];
+
+import type { Lang } from '@/context/LanguageContext';
+
+/**
+ * Type-safe translation accessor.
+ * Falls back to 'en' for languages not yet fully translated (ar, ru, am, fr).
+ * Usage: const text = getT(lang).nav;
+ */
+export function getT(lang: Lang): typeof t['en'] {
+  if (lang in t) return (t as unknown as Record<string, typeof t['en']>)[lang];
+  return t.en;
+}

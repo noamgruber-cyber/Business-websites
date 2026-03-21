@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
-import { t } from "@/lib/translations";
+import { getT } from "@/lib/translations";
 
 /**
  * TemplateShowcase — Horizontal grid of template category cards.
@@ -14,7 +14,7 @@ const TEMPLATE_ICONS = ["💈", "🍕", "💅", "🏋️", "☕", "📸"];
 
 export default function TemplateShowcase() {
   const { lang } = useLanguage();
-  const text = t[lang].templates;
+  const text = getT(lang).templates;
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
