@@ -10,12 +10,16 @@ const DESCRIPTION =
   'The easiest way for small businesses to get online. Create a professional website for your barbershop, restaurant, or salon in minutes. No coding required.';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://siteforge.vercel.app'),
   title: 'SiteForge — Build a Website for Your Business in 5 Minutes',
   description: DESCRIPTION,
   keywords: [
     'website builder', 'small business website', 'barbershop website',
     'restaurant website', 'Israel', 'no code', 'nail salon website',
   ],
+  alternates: {
+    canonical: 'https://siteforge.vercel.app',
+  },
   openGraph: {
     title: 'SiteForge — Your Business Deserves a Beautiful Website',
     description: DESCRIPTION,

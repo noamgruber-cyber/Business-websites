@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Examples — SiteForge Business Websites',
   description: 'Browse beautiful website examples built with SiteForge. See templates for barbershops, restaurants, nail salons, gyms, cafes, and photography studios.',
+  alternates: { canonical: 'https://siteforge.vercel.app/examples' },
   openGraph: {
     title: 'Examples — SiteForge Business Websites',
     description: 'Browse beautiful website examples built with SiteForge for barbershops, restaurants, nail salons, gyms, cafes, and photography studios.',

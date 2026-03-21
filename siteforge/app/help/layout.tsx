@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Help Center — SiteForge',
   description: 'Find answers to common questions about SiteForge. Learn how to build, publish, and manage your business website.',
+  alternates: { canonical: 'https://siteforge.vercel.app/help' },
   openGraph: {
     title: 'Help Center — SiteForge',
     description: 'Find answers to common questions about SiteForge. Learn how to build, publish, and manage your business website.',

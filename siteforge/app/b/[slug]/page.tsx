@@ -58,18 +58,33 @@ async function loadBusiness(slug: string): Promise<BusinessData | null | 'offlin
   return getMockBusiness(slug);
 }
 
+const CATEGORY_LABELS: Record<string, string> = {
+  barbershop:  'Barbershop',
+  restaurant:  'Restaurant',
+  nail_salon:  'Nail Salon',
+  gym:         'Gym',
+  cafe:        'Café',
+  photography: 'Photography Studio',
+};
+
 // ── SEO Metadata ──────────────────────────────────────────────────────────────
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const business = await loadBusiness(params.slug);
   if (!business || business === 'offline') return { title: 'Business Not Found — SiteForge' };
 
-  const desc = `${business.tagline} ${business.description}`.slice(0, 155);
+  const catLabel = CATEGORY_LABELS[business.category] ?? business.category;
+  const title = `${business.businessName} — ${catLabel} in ${business.city}`;
+  const desc = `${business.tagline} ${business.description.slice(0, 100)}`.trim().slice(0, 155);
+  const canonicalUrl = `https://siteforge.vercel.app/b/${params.slug}`;
+
   return {
-    title: `${business.businessName} — ${business.city}`,
+    title,
     description: desc,
+    alternates: { canonical: canonicalUrl },
     openGraph: {
-      title: `${business.businessName} — ${business.city}`,
+      title,
       description: desc,
+      url: canonicalUrl,
       images: business.coverPhotoUrl ? [{ url: business.coverPhotoUrl }] : [],
     },
   };
