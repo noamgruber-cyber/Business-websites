@@ -108,12 +108,19 @@ export default function NailSalonHero({ business }: Props) {
         className="relative min-h-[50vh] lg:min-h-full overflow-hidden"
         style={{ order: -1 }}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={business.coverPhotoUrl || 'https://picsum.photos/seed/nailsalon/800/1000'}
-          alt={business.businessName}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
+        {business.coverPhotoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={business.coverPhotoUrl}
+            alt={business.businessName}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(135deg, #fff0f5 0%, #d4547a 60%, #8b1a3a 100%)' }}
+          />
+        )}
       </motion.div>
     </section>
   );

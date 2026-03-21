@@ -446,7 +446,7 @@ function BusinessCard({
       {/* Info */}
       <div className="p-5 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-2 mb-0.5">
-          <h3 className="text-white font-bold text-lg leading-tight">{b.businessName || 'Untitled'}</h3>
+          <h3 className="text-white font-bold text-lg leading-tight truncate max-w-[180px]" title={b.businessName || 'Untitled'}>{b.businessName || 'Untitled'}</h3>
           <span className="text-xl flex-shrink-0 mt-0.5">{CATEGORY_EMOJI[b.category]}</span>
         </div>
         <p className="text-white/40 text-xs mb-1">{categoryLabel}</p>

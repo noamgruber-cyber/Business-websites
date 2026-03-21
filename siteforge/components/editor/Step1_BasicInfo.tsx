@@ -5,14 +5,20 @@ import InputField from '@/components/ui/InputField';
 import TextAreaField from '@/components/ui/TextAreaField';
 import ImageUploadBox from '@/components/ui/ImageUploadBox';
 
-function generateSlug(name: string): string {
-  return name
+function generateSlug(name: string, category?: string): string {
+  const stripped = name
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-{2,}/g, '-')
-    .replace(/^-|-$/g, '');
+    .replace(/[\u0590-\u05FF\u05B0-\u05C7]/g, '') // strip Hebrew characters
+    .replace(/[^a-z0-9\s-]/g, '')                  // remove remaining special chars
+    .replace(/\s+/g, '-')                           // spaces → dashes
+    .replace(/-{2,}/g, '-')                         // collapse multiple dashes
+    .replace(/^-|-$/g, '');                         // trim leading/trailing dashes
+  if (!stripped) {
+    const base = (category ?? 'business').replace(/_/g, '-');
+    return `${base}-${Date.now().toString(36)}`;
+  }
+  return stripped;
 }
 
 export default function Step1_BasicInfo() {
@@ -21,12 +27,12 @@ export default function Step1_BasicInfo() {
   const handleNameChange = (value: string) => {
     updateBusinessData({
       businessName: value,
-      slug: generateSlug(value),
+      slug: generateSlug(value, businessData.category),
     });
   };
 
   const handleSlugChange = (value: string) => {
-    updateBusinessData({ slug: generateSlug(value) });
+    updateBusinessData({ slug: generateSlug(value, businessData.category) });
   };
 
   return (

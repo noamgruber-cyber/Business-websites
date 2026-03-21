@@ -10,6 +10,8 @@ const CREAM2 = '#f0ebe1';
 type Props = { business: BusinessData };
 
 export default function RestaurantMenu({ business }: Props) {
+  if (!business.services || business.services.length === 0) return null;
+
   const half = Math.ceil(business.services.length / 2);
   const col1 = business.services.slice(0, half);
   const col2 = business.services.slice(half);

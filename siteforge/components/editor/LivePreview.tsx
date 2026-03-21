@@ -109,7 +109,7 @@ export default function LivePreview() {
                     {displayName[0]?.toUpperCase() ?? '?'}
                   </span>
                 )}
-                <span style={{ color: 'white', fontWeight: 700, fontSize: 15 }}>{displayName}</span>
+                <span style={{ color: 'white', fontWeight: 700, fontSize: 15, maxWidth: 160, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{displayName}</span>
               </div>
               <div style={{ display: 'flex', gap: 14 }}>
                 {['Services', 'About', 'Contact'].map((item) => (
@@ -132,7 +132,7 @@ export default function LivePreview() {
                 <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)' }} />
               )}
               <div style={{ position: 'relative', zIndex: 1 }}>
-                <h1 style={{ color: 'white', fontWeight: 900, fontSize: 26, margin: '0 0 6px', lineHeight: 1.2 }}>
+                <h1 style={{ color: 'white', fontWeight: 900, fontSize: 26, margin: '0 0 6px', lineHeight: 1.2, maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {displayName}
                 </h1>
                 {businessData.tagline ? (

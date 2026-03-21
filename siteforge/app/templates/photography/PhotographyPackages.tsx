@@ -6,6 +6,8 @@ import { BusinessData } from '@/lib/types';
 type Props = { business: BusinessData };
 
 export default function PhotographyPackages({ business }: Props) {
+  if (!business.services || business.services.length === 0) return null;
+
   const waLink = `https://wa.me/${business.whatsapp}?text=Hi%2C%20I'd%20like%20to%20book%20a%20session`;
 
   return (

@@ -21,6 +21,8 @@ function inferCategory(name: string): string {
 }
 
 export default function CafeMenu({ business }: Props) {
+  if (!business.services || business.services.length === 0) return null;
+
   // Group services by inferred category
   const groups: Record<string, typeof business.services> = {};
   business.services.forEach((svc) => {

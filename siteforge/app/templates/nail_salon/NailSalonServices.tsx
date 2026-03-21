@@ -9,6 +9,8 @@ const BG   = '#fff9fb';
 type Props = { business: BusinessData };
 
 export default function NailSalonServices({ business }: Props) {
+  if (!business.services || business.services.length === 0) return null;
+
   return (
     <section id="services" style={{ backgroundColor: BG }} className="py-20 px-6 sm:px-14">
       <div className="max-w-4xl mx-auto">
