@@ -2,9 +2,9 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
-export type Lang = 'he' | 'en' | 'ar' | 'ru' | 'am' | 'fr';
+export type Lang = 'he' | 'en';
 
-const RTL_LANGS: Lang[] = ['he', 'ar'];
+const RTL_LANGS: Lang[] = ['he'];
 
 type LanguageContextValue = {
   lang: Lang;
@@ -24,15 +24,11 @@ function detectBrowserLang(): Lang {
   const nav = navigator.language || '';
   const base = nav.split('-')[0].toLowerCase();
   if (base === 'he') return 'he';
-  if (base === 'ar') return 'ar';
-  if (base === 'ru') return 'ru';
-  if (base === 'am') return 'am';
-  if (base === 'fr') return 'fr';
   if (base === 'en') return 'en';
   return 'he'; // default for Israel
 }
 
-const VALID_LANGS: Lang[] = ['he', 'en', 'ar', 'ru', 'am', 'fr'];
+const VALID_LANGS: Lang[] = ['he', 'en'];
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLangState] = useState<Lang>('he');

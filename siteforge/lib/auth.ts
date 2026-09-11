@@ -4,19 +4,19 @@ import {
   signOut as firebaseSignOut,
   User,
 } from 'firebase/auth';
-import { auth } from './firebase';
+import { getFirebaseAuth } from './firebaseAuth';
 
 const googleProvider = new GoogleAuthProvider();
 
 export async function signInWithGoogle(): Promise<User> {
-  const result = await signInWithPopup(auth, googleProvider);
+  const result = await signInWithPopup(getFirebaseAuth(), googleProvider);
   return result.user;
 }
 
 export async function signOut(): Promise<void> {
-  await firebaseSignOut(auth);
+  await firebaseSignOut(getFirebaseAuth());
 }
 
 export function getCurrentUser(): User | null {
-  return auth.currentUser;
+  return getFirebaseAuth().currentUser;
 }
