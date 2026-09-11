@@ -52,4 +52,4 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Verify generated layouts
-        run: npm run test:e2e -- tests/e2e/generatedSite.spec.tsx
+        run: npm run test:e2e -- tests/e2e/generatedSite.spec.ts

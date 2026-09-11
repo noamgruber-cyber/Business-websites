@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import GeneratedSite from '@/components/generated/GeneratedSite';
 import type { SiteBlueprintV1 } from '@/lib/siteContracts';
@@ -79,14 +80,14 @@ for (const language of ['he', 'en'] as const) {
 
       const blueprint = fixture(language, layout);
       const markup = renderToStaticMarkup(
-        <GeneratedSite
-          blueprint={blueprint}
-          media={{
+        createElement(GeneratedSite, {
+          blueprint,
+          media: {
             '22222222-2222-4222-8222-222222222222': { url: pixel },
             '33333333-3333-4333-8333-333333333333': { url: pixel },
             '44444444-4444-4444-8444-444444444444': { url: pixel },
-          }}
-        />,
+          },
+        }),
       );
 
       for (const width of widths) {
