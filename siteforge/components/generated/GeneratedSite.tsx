@@ -20,6 +20,8 @@ const labels = {
     email: 'Email',
     instagram: 'Instagram',
     facebook: 'Facebook',
+    heroActions: 'Quick contact',
+    footerActions: 'Contact details',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
   },
   he: {
@@ -34,6 +36,8 @@ const labels = {
     email: 'אימייל',
     instagram: 'Instagram',
     facebook: 'Facebook',
+    heroActions: 'יצירת קשר מהירה',
+    footerActions: 'פרטי יצירת קשר',
     days: ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'שבת'],
   },
 } as const;
@@ -99,7 +103,7 @@ export default function GeneratedSite({ blueprint, media, preview = false }: Pro
           <h1>{facts.businessName}</h1>
           {blueprint.tagline && <p className="sf-tagline">{blueprint.tagline}</p>}
           {links.length > 0 && (
-            <nav className="sf-actions" aria-label={text.contact}>
+            <nav className="sf-actions" aria-label={text.heroActions}>
               {links.slice(0, 3).map((link) => (
                 <a key={`${link.label}-${link.href}`} href={link.href}>{link.label}</a>
               ))}
@@ -163,7 +167,7 @@ export default function GeneratedSite({ blueprint, media, preview = false }: Pro
         {(facts.address || facts.city) && (
           <address>{[facts.address, facts.city].filter(Boolean).join(', ')}</address>
         )}
-        <nav className="sf-actions" aria-label={text.contact}>
+        <nav className="sf-actions" aria-label={text.footerActions}>
           {links.map((link) => (
             <a key={`${link.label}-${link.href}`} href={link.href}>{link.label}</a>
           ))}
