@@ -998,9 +998,12 @@ After the pilot, in order: API-key authenticated external submissions using the 
 | 1 | Complete | `docs/automation-baseline.md` records the real baseline failures, isolated Next 16 probe, exact compatibility changes, provider API choices, and unresolved production/account gates. |
 | 2 | Complete | Framework and feature dependencies locked; CLI lint, typecheck, Vitest, Playwright and worker scripts added. Build, typecheck and lint pass; Vitest starts with the planned temporary no-tests condition. |
 | 3 | Complete | Added strict TypeScript contracts and Zod schemas for draft, generation, blueprint and mutation requests. Ten unit tests cover incomplete drafts, contact and URL safety, limits, image rights, premium/category restrictions, unknown private fields, duplicate sections and publication confirmation. |
+| 4 | In progress | Server-only Firebase Admin initialization, fresh-token exchange, five-day revocation-checked sessions, same-origin enforcement and six unit tests are implemented. The real Auth Emulator run is blocked because this environment denied the emulator binary download. |
+| 5 | In progress | Existing Firebase login now restores, exchanges and clears the server session while preserving the current `useAuth` API; five bridge tests pass. Final completion waits for the Auth Emulator gate from Step 4. |
 
 ## Changelog
 
 - 2026-09-10: Initial repository-grounded proposal; retained Firebase/Cloudinary; defined private intake, durable jobs, structured generation, shared rendering, version-bound publication and legacy cutover.
 - 2026-09-10: Executed Steps 1 and 2; upgraded the supported runtime, fixed baseline language and Firebase prerender failures, and added the dependency and verification harness.
 - 2026-09-11: Executed Step 3; added strict intake, generated-output, blueprint and API request validation with passing contract tests.
+- 2026-09-11: Implemented Steps 4 and 5 through local unit and build verification; retained their open status until the Firebase Auth Emulator integration gate can run.
