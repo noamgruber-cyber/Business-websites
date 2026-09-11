@@ -1,0 +1,55 @@
+name: SiteForge foundation CI
+
+on:
+  pull_request:
+    paths:
+      - 'siteforge/**'
+      - '.github/workflows/siteforge-foundation-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: siteforge
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22.20.0'
+          cache: npm
+          cache-dependency-path: siteforge/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Run Firebase Auth Emulator tests
+        env:
+          FIREBASE_PROJECT_ID: demo-siteforge
+        run: npx firebase emulators:exec --only auth --project demo-siteforge --config firebase.emulator.json "npm run test -- tests/sessionEmulator.test.ts"
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify generated layouts
+        run: npm run test:e2e -- tests/e2e/generatedSite.spec.tsx
