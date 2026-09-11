@@ -1000,6 +1000,7 @@ After the pilot, in order: API-key authenticated external submissions using the 
 | 3 | Complete | Added strict TypeScript contracts and Zod schemas for draft, generation, blueprint and mutation requests. Ten unit tests cover incomplete drafts, contact and URL safety, limits, image rights, premium/category restrictions, unknown private fields, duplicate sections and publication confirmation. |
 | 4 | In progress | Server-only Firebase Admin initialization, fresh-token exchange, five-day revocation-checked sessions, same-origin enforcement and six unit tests are implemented. The real Auth Emulator run is blocked because this environment denied the emulator binary download. |
 | 5 | In progress | Existing Firebase login now restores, exchanges and clears the server session while preserving the current `useAuth` API; five bridge tests pass. Final completion waits for the Auth Emulator gate from Step 4. |
+| 11 | In progress | Added the pure shared renderer, three responsive CSS recipes, explicit Hebrew/English labels, safe contact links, fixed palette contrast selection and eight static-render tests. Browser verification at 375/768/1440 waits for an available Playwright browser binary. |
 
 ## Changelog
 
@@ -1007,3 +1008,4 @@ After the pilot, in order: API-key authenticated external submissions using the 
 - 2026-09-10: Executed Steps 1 and 2; upgraded the supported runtime, fixed baseline language and Firebase prerender failures, and added the dependency and verification harness.
 - 2026-09-11: Executed Step 3; added strict intake, generated-output, blueprint and API request validation with passing contract tests.
 - 2026-09-11: Implemented Steps 4 and 5 through local unit and build verification; retained their open status until the Firebase Auth Emulator integration gate can run.
+- 2026-09-11: Implemented the Step 11 renderer and static fixtures; retained its open status until the three-width Playwright gate can run.
