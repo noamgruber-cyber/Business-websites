@@ -1,5 +1,4 @@
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -7,7 +6,7 @@ import GeneratedSite from '@/components/generated/GeneratedSite';
 import type { SiteBlueprintV1 } from '@/lib/siteContracts';
 
 const css = readFileSync(
-  fileURLToPath(new URL('../../components/generated/site.css', import.meta.url)),
+  `${process.cwd()}/components/generated/site.css`,
   'utf8',
 );
 const pixel = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
