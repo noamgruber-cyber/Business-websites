@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
-    "test:e2e": "playwright test",
+    "test:e2e": "node --import tsx scripts/renderGeneratedFixtures.tsx && playwright test",
     "worker": "tsx worker/index.ts"
   },
   "dependencies": {
