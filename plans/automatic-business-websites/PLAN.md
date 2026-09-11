@@ -356,9 +356,9 @@ Checked on 2026-09-10. These support provider behavior, not the proposed product
 
 ## Progress
 
-- [ ] Step 1: Record the executable baseline and resolve launch prerequisites (depends on nothing)
-- [ ] Step 2: Establish the dependency and verification harness (depends on 1)
-- [ ] Step 3: Define and verify the intake and blueprint schemas (depends on 2)
+- [x] Step 1: Record the executable baseline and resolve launch prerequisites (depends on nothing)
+- [x] Step 2: Establish the dependency and verification harness (depends on 1)
+- [x] Step 3: Define and verify the intake and blueprint schemas (depends on 2)
 - [ ] Step 4: Add server identity and verified sessions (depends on 3)
 - [ ] Step 5: Bridge existing login to server sessions (depends on 4)
 - [ ] Step 6: Declare private storage rules and indexes (depends on 4)
@@ -977,7 +977,7 @@ Feature flags keep partial work away from public generation/publication. An impl
 | Meaning of incoming submission | Default is an owner using our form; external API is later | A change would revise intake only | User |
 | Scope and publication | One-page site; customer reviews and publishes | A change revises workflow contracts | User |
 | Target repository | Business-websites selected from matching inspected code | Re-target if user identifies another repository | User |
-| Framework/package compatibility | Existing Next 14.2.5 verified; installed upgrade compatibility not verified | Step 2 until the bounded prerequisite in Step 1 is recorded | Planner/executor |
+| Framework/package compatibility | Upgraded and verified on Next 16.3.4, React 19.3.0 and Node `>=22.13.0`; ESLint remains pinned to compatible 9.39.3 until the Next React plugin supports ESLint 10 | Track the ESLint compatibility constraint | Executor |
 | Exact model and pricing | Structured-output behavior verified; actual account access and cost unverified | Live AI smoke test and pilot enablement | Operator/planner |
 | Firebase project/rules/live data | Source code inspected; deployed rules/data not available in this planning turn | Staging integration and legacy cutover | Operator |
 | Authenticated Cloudinary delivery | Provider capability documented; account settings unverified | Private-media smoke test | Operator/executor |
@@ -995,7 +995,12 @@ After the pilot, in order: API-key authenticated external submissions using the 
 | Step | Result | Evidence / blocker |
 |---|---|---|
 | Planning | Complete | Repository and official provider documentation inspected. No implementation or deployment performed. |
+| 1 | Complete | `docs/automation-baseline.md` records the real baseline failures, isolated Next 16 probe, exact compatibility changes, provider API choices, and unresolved production/account gates. |
+| 2 | Complete | Framework and feature dependencies locked; CLI lint, typecheck, Vitest, Playwright and worker scripts added. Build, typecheck and lint pass; Vitest starts with the planned temporary no-tests condition. |
+| 3 | Complete | Added strict TypeScript contracts and Zod schemas for draft, generation, blueprint and mutation requests. Ten unit tests cover incomplete drafts, contact and URL safety, limits, image rights, premium/category restrictions, unknown private fields, duplicate sections and publication confirmation. |
 
 ## Changelog
 
 - 2026-09-10: Initial repository-grounded proposal; retained Firebase/Cloudinary; defined private intake, durable jobs, structured generation, shared rendering, version-bound publication and legacy cutover.
+- 2026-09-10: Executed Steps 1 and 2; upgraded the supported runtime, fixed baseline language and Firebase prerender failures, and added the dependency and verification harness.
+- 2026-09-11: Executed Step 3; added strict intake, generated-output, blueprint and API request validation with passing contract tests.
