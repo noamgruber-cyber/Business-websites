@@ -1002,6 +1002,8 @@ After the pilot, in order: API-key authenticated external submissions using the 
 | 5 | Complete | Existing Firebase login restores, exchanges and clears the server session while preserving the current `useAuth` API. Five bridge tests pass together with the session verification and emulator gates in GitHub Actions run 34577563720. |
 | 11 | Complete | Added the pure shared renderer, three responsive CSS recipes, explicit Hebrew/English labels, safe contact links, fixed palette contrast selection and eight static-render tests. Six Playwright scenarios pass Axe, image, link and overflow checks for Hebrew and English across all three recipes at 375, 768 and 1440 pixels in GitHub Actions run 34577563720. |
 
+| 6 | In progress | Prepared emulator-only deny-all rules, all C2 compound indexes/map exclusions, and anonymous/authenticated client access tests for every v2 collection. Deployed rules import and staging project selection remain open; no production deploy config is created. |
+
 ## Changelog
 
 - 2026-09-10: Initial repository-grounded proposal; retained Firebase/Cloudinary; defined private intake, durable jobs, structured generation, shared rendering, version-bound publication and legacy cutover.
@@ -1010,3 +1012,5 @@ After the pilot, in order: API-key authenticated external submissions using the 
 - 2026-09-11: Implemented Steps 4 and 5 through local unit and build verification; retained their open status until the Firebase Auth Emulator integration gate can run.
 - 2026-09-11: Implemented the Step 11 renderer and static fixtures; retained its open status until the three-width Playwright gate can run.
 - 2026-09-11: Completed Steps 4, 5 and 11 after GitHub Actions passed session integration, Firebase Auth Emulator, build, browser layout and Axe accessibility verification.
+
+- 2026-09-11: Prepared the isolated Step 6 emulator baseline and CI gate. This does not satisfy deployed legacy rules inspection or staging configuration; Step 6 remains open.

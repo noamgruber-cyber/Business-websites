@@ -34,10 +34,16 @@ jobs:
       - name: Run unit tests
         run: npm run test
 
-      - name: Run Firebase Auth Emulator tests
+      - name: Select Java 21 for Firestore Emulator
+        run: |
+          test -x "$JAVA_HOME_21_X64/bin/java"
+          echo "JAVA_HOME=$JAVA_HOME_21_X64" >> "$GITHUB_ENV"
+          echo "$JAVA_HOME_21_X64/bin" >> "$GITHUB_PATH"
+
+      - name: Run Firebase Auth and Firestore Emulator tests
         env:
           FIREBASE_PROJECT_ID: demo-siteforge
-        run: npx firebase emulators:exec --only auth --project demo-siteforge --config firebase.emulator.json "npm run test -- tests/sessionEmulator.test.ts"
+        run: npx firebase emulators:exec --only auth,firestore --project demo-siteforge --config firebase.emulator.json "npm run test -- tests/sessionEmulator.test.ts tests/firestoreEmulator.test.ts"
 
       - name: Typecheck
         run: npm run typecheck

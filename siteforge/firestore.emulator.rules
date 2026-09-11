@@ -1,0 +1,11 @@
+// Emulator-only baseline. Not a replacement for deployed legacy rules.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // All v2 collections are accessed through authenticated server services.
+    // Admin SDK bypasses these rules; ownership checks belong in each service.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
