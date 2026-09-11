@@ -1,8 +1,8 @@
 # PLAN: SiteForge automatic business websites
 
-**Status:** implementation proposal, with verified repository grounding and explicit launch gates.
+**Status:** implementation in progress, with verified repository grounding and explicit launch gates.
 **Created:** 2026-09-10
-**Scope of this change:** planning document only.
+**Scope of this change:** executable plan and implementation tracking.
 **Target repository:** `noamgruber-cyber/Business-websites`.
 **Inspected branch:** `claude/siteforge-homepage-ryOsQ`.
 **Inspected commit:** `9bd37cce88259e0c5a7c1a5ebc451526e559f5b9`.
@@ -359,14 +359,14 @@ Checked on 2026-09-10. These support provider behavior, not the proposed product
 - [x] Step 1: Record the executable baseline and resolve launch prerequisites (depends on nothing)
 - [x] Step 2: Establish the dependency and verification harness (depends on 1)
 - [x] Step 3: Define and verify the intake and blueprint schemas (depends on 2)
-- [ ] Step 4: Add server identity and verified sessions (depends on 3)
-- [ ] Step 5: Bridge existing login to server sessions (depends on 4)
+- [x] Step 4: Add server identity and verified sessions (depends on 3)
+- [x] Step 5: Bridge existing login to server sessions (depends on 4)
 - [ ] Step 6: Declare private storage rules and indexes (depends on 4)
 - [ ] Step 7: Implement transactional draft persistence (depends on 3,4,6)
 - [ ] Step 8: Save drafts with revision checks (depends on 7)
 - [ ] Step 9: Reserve bounded image uploads (depends on 7,8)
 - [ ] Step 10: Sanitize uploads and serve private images (depends on 9)
-- [ ] Step 11: Build shared generation rendering primitives (depends on 3)
+- [x] Step 11: Build shared generation rendering primitives (depends on 3)
 - [ ] Step 12: Define generation prompts and the provider adapter (depends on 3,10,11)
 - [ ] Step 13: Enqueue generation atomically (depends on 7,8,12)
 - [ ] Step 14: Run the recoverable generation worker (depends on 13)
@@ -998,9 +998,9 @@ After the pilot, in order: API-key authenticated external submissions using the 
 | 1 | Complete | `docs/automation-baseline.md` records the real baseline failures, isolated Next 16 probe, exact compatibility changes, provider API choices, and unresolved production/account gates. |
 | 2 | Complete | Framework and feature dependencies locked; CLI lint, typecheck, Vitest, Playwright and worker scripts added. Build, typecheck and lint pass; Vitest starts with the planned temporary no-tests condition. |
 | 3 | Complete | Added strict TypeScript contracts and Zod schemas for draft, generation, blueprint and mutation requests. Ten unit tests cover incomplete drafts, contact and URL safety, limits, image rights, premium/category restrictions, unknown private fields, duplicate sections and publication confirmation. |
-| 4 | In progress | Server-only Firebase Admin initialization, fresh-token exchange, five-day revocation-checked sessions, same-origin enforcement and six unit tests are implemented. The real Auth Emulator run is blocked because this environment denied the emulator binary download. |
-| 5 | In progress | Existing Firebase login now restores, exchanges and clears the server session while preserving the current `useAuth` API; five bridge tests pass. Final completion waits for the Auth Emulator gate from Step 4. |
-| 11 | In progress | Added the pure shared renderer, three responsive CSS recipes, explicit Hebrew/English labels, safe contact links, fixed palette contrast selection and eight static-render tests. Browser verification at 375/768/1440 waits for an available Playwright browser binary. |
+| 4 | Complete | Added server-only Firebase Admin initialization, fresh-token exchange, five-day revocation-checked sessions and same-origin enforcement. Six unit tests and three Firebase Auth Emulator integration tests pass in GitHub Actions run 34577563720. |
+| 5 | Complete | Existing Firebase login restores, exchanges and clears the server session while preserving the current `useAuth` API. Five bridge tests pass together with the session verification and emulator gates in GitHub Actions run 34577563720. |
+| 11 | Complete | Added the pure shared renderer, three responsive CSS recipes, explicit Hebrew/English labels, safe contact links, fixed palette contrast selection and eight static-render tests. Six Playwright scenarios pass Axe, image, link and overflow checks for Hebrew and English across all three recipes at 375, 768 and 1440 pixels in GitHub Actions run 34577563720. |
 
 ## Changelog
 
@@ -1009,3 +1009,4 @@ After the pilot, in order: API-key authenticated external submissions using the 
 - 2026-09-11: Executed Step 3; added strict intake, generated-output, blueprint and API request validation with passing contract tests.
 - 2026-09-11: Implemented Steps 4 and 5 through local unit and build verification; retained their open status until the Firebase Auth Emulator integration gate can run.
 - 2026-09-11: Implemented the Step 11 renderer and static fixtures; retained its open status until the three-width Playwright gate can run.
+- 2026-09-11: Completed Steps 4, 5 and 11 after GitHub Actions passed session integration, Firebase Auth Emulator, build, browser layout and Axe accessibility verification.
