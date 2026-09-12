@@ -43,7 +43,7 @@ jobs:
       - name: Run Firebase Auth and Firestore Emulator tests
         env:
           FIREBASE_PROJECT_ID: demo-siteforge
-        run: npx firebase emulators:exec --only auth,firestore --project demo-siteforge --config firebase.emulator.json "npm run test -- tests/sessionEmulator.test.ts tests/firestoreEmulator.test.ts"
+        run: npx firebase emulators:exec --only auth,firestore --project demo-siteforge --config firebase.emulator.json "npm run test -- tests/sessionEmulator.test.ts tests/firestoreEmulator.test.ts tests/draftConcurrency.test.ts tests/assetReservations.test.ts"
 
       - name: Typecheck
         run: npm run typecheck

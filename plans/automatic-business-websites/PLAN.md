@@ -1004,6 +1004,10 @@ After the pilot, in order: API-key authenticated external submissions using the 
 
 | 6 | In progress | Prepared emulator-only deny-all rules, all C2 compound indexes/map exclusions, and anonymous/authenticated client access tests for every v2 collection. Deployed rules import and staging project selection remain open; no production deploy config is created. |
 
+| 7,8,9 | Implemented; emulator gate pending | Added authenticated, default-disabled site APIs, transactional one-site creation/idempotency, bounded owner reads, revision-checked drafts, atomic soft deletion/cancellation, and role/hour-limited image reservations. CI now runs concurrency and reservation integration suites. |
+| 10 | Partial | Added tested image decoding, pixel/byte/type limits, orientation normalization, metadata removal and WebP encoding. Multipart ingestion and authenticated Cloudinary delivery remain unconnected. |
+| 12 | Partial | Added versioned prompt and strict Responses adapter with injected-provider tests, image derivative checks, refusal/incomplete handling, no SDK retries and default-disabled paid calls. Live account smoke test and worker usage persistence remain open. |
+
 ## Changelog
 
 - 2026-09-10: Initial repository-grounded proposal; retained Firebase/Cloudinary; defined private intake, durable jobs, structured generation, shared rendering, version-bound publication and legacy cutover.
@@ -1014,3 +1018,7 @@ After the pilot, in order: API-key authenticated external submissions using the 
 - 2026-09-11: Completed Steps 4, 5 and 11 after GitHub Actions passed session integration, Firebase Auth Emulator, build, browser layout and Axe accessibility verification.
 
 - 2026-09-11: Prepared the isolated Step 6 emulator baseline and CI gate. This does not satisfy deployed legacy rules inspection or staging configuration; Step 6 remains open.
+
+- 2026-09-12: User authorized all currently feasible implementation. Develop Steps 7 onward against the verified demo emulator while Step 6 deployment gates remain open. New private endpoints require SITE_AUTOMATION_ENABLED=true (default false); no production enablement, migration, provider connection or deployment is implied.
+
+- 2026-09-12: Preparatory media sanitation and provider adapter are independently testable portions of Steps 10/12; their full dependencies remain open. The generation adapter returns `{draft, providerResponseId, model, promptVersion, usage}` so a future worker can persist accounting, rather than returning only `GeneratedDraftV1`. Owner version DTOs omit prompt/model metadata. Asset documents carry internal `reservationExpiresAt` to support expiring slot queries. Expired upload allowances remain charged conservatively until the UTC-hour boundary; retries do not charge twice.
