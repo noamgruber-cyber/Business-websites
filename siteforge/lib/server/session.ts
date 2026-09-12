@@ -123,7 +123,7 @@ export function apiFailure(error: unknown, requestId = crypto.randomUUID()) {
   return apiResponse<never>(
     {
       ok: false,
-      error: { code: 'SERVICE_UNAVAILABLE', message: 'Authentication service is unavailable' },
+      error: { code: 'SERVICE_UNAVAILABLE', message: 'Service is unavailable' },
       requestId,
     },
     503,
