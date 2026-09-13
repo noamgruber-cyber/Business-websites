@@ -362,9 +362,9 @@ Checked on 2026-09-10. These support provider behavior, not the proposed product
 - [x] Step 4: Add server identity and verified sessions (depends on 3)
 - [x] Step 5: Bridge existing login to server sessions (depends on 4)
 - [ ] Step 6: Declare private storage rules and indexes (depends on 4)
-- [ ] Step 7: Implement transactional draft persistence (depends on 3,4,6)
-- [ ] Step 8: Save drafts with revision checks (depends on 7)
-- [ ] Step 9: Reserve bounded image uploads (depends on 7,8)
+- [x] Step 7: Implement transactional draft persistence (depends on 3,4,6)
+- [x] Step 8: Save drafts with revision checks (depends on 7)
+- [x] Step 9: Reserve bounded image uploads (depends on 7,8)
 - [ ] Step 10: Sanitize uploads and serve private images (depends on 9)
 - [x] Step 11: Build shared generation rendering primitives (depends on 3)
 - [ ] Step 12: Define generation prompts and the provider adapter (depends on 3,10,11)
@@ -1004,8 +1004,8 @@ After the pilot, in order: API-key authenticated external submissions using the 
 
 | 6 | In progress | Prepared emulator-only deny-all rules, all C2 compound indexes/map exclusions, and anonymous/authenticated client access tests for every v2 collection. Deployed rules import and staging project selection remain open; no production deploy config is created. |
 
-| 7,8,9 | Implemented; emulator gate pending | Added authenticated, default-disabled site APIs, transactional one-site creation/idempotency, bounded owner reads, revision-checked drafts, atomic soft deletion/cancellation, and role/hour-limited image reservations. CI now runs concurrency and reservation integration suites. |
-| 10 | Partial | Added tested image decoding, pixel/byte/type limits, orientation normalization, metadata removal and WebP encoding. Multipart ingestion and authenticated Cloudinary delivery remain unconnected. |
+| 7,8,9 | Complete in emulator; production gated | Added authenticated, default-disabled site APIs, transactional one-site creation/idempotency, bounded owner reads, revision-checked drafts, atomic soft deletion/cancellation, and role/hour-limited image reservations. All 12 concurrency/reservation integration tests passed in GitHub Actions run 34677375331, alongside 29 existing emulator tests, 42 unit tests, typecheck, lint and build. Step 6 production rules/staging gates remain required before enabling these APIs. |
+| 10 | Partial | Added tested image decoding, pixel/byte/type limits, orientation normalization, metadata removal and WebP encoding. Added bounded multipart ingestion with five passing tests; ingestion and authenticated Cloudinary delivery remain unconnected to the active upload route. |
 | 12 | Partial | Added versioned prompt and strict Responses adapter with injected-provider tests, image derivative checks, refusal/incomplete handling, no SDK retries and default-disabled paid calls. Live account smoke test and worker usage persistence remain open. |
 
 ## Changelog
@@ -1022,3 +1022,7 @@ After the pilot, in order: API-key authenticated external submissions using the 
 - 2026-09-12: User authorized all currently feasible implementation. Develop Steps 7 onward against the verified demo emulator while Step 6 deployment gates remain open. New private endpoints require SITE_AUTOMATION_ENABLED=true (default false); no production enablement, migration, provider connection or deployment is implied.
 
 - 2026-09-12: Preparatory media sanitation and provider adapter are independently testable portions of Steps 10/12; their full dependencies remain open. The generation adapter returns `{draft, providerResponseId, model, promptVersion, usage}` so a future worker can persist accounting, rather than returning only `GeneratedDraftV1`. Owner version DTOs omit prompt/model metadata. Asset documents carry internal `reservationExpiresAt` to support expiring slot queries. Expired upload allowances remain charged conservatively until the UTC-hour boundary; retries do not charge twice.
+
+- 2026-09-12: Verified Steps 7/8/9 against Firestore Emulator in CI run 34677375331. No provider connection, production enablement, merge or deployment performed.
+
+- 2026-09-13: Added bounded multipart reader with type, field, file-size and total-body checks. Five reader tests and typecheck pass locally. Existing CI run 34677375331 completed successfully.
