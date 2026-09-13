@@ -36,8 +36,10 @@ export async function readImageUpload(request: Request) {
   let failure: SessionError | undefined;
   function fail(error: SessionError) {
     failure ??= error;
-    // pipeline propagates parser errors and cancels the request stream.
-    parser.destroy(error);
+    // Busboy mutates its file state after emitting limit events. Destroying
+    // synchronously inside that callback invalidates its active parser frame.
+    // Defer cancellation until the current chunk has finished processing.
+    queueMicrotask(() => parser.destroy(error));
   }
   parser.on('field', (name, value, info) => {
     if (!['siteId', 'assetId'].includes(name) || fields.has(name) || info.nameTruncated || info.valueTruncated) {
@@ -52,7 +54,7 @@ export async function readImageUpload(request: Request) {
     }
     fileName = info.filename; mime = info.mimeType;
     file.on('limit', () => fail(reject('Image exceeds 3 MiB', 413)));
-    file.on('data', (chunk: Buffer) => chunks.push(chunk));
+    file.on('data', (chunk: Buffer) => { if (!failure) chunks.push(chunk); });
   });
   for (const event of ['partsLimit', 'filesLimit', 'fieldsLimit'] as const) parser.on(event, () => fail(reject('Too many upload fields or files')));
   try { await pipeline(source, bounded, parser); }
@@ -61,6 +63,7 @@ export async function readImageUpload(request: Request) {
     if (error instanceof SessionError) throw error;
     throw reject('Incomplete or malformed image upload');
   }
+  if (failure) throw failure;
   const siteId = fields.get('siteId'), assetId = fields.get('assetId');
   if (!z.uuid().safeParse(siteId).success || !z.uuid().safeParse(assetId).success || !fileName || !mime || chunks.length === 0) throw reject('Provide siteId, assetId and a nonempty image');
   return { siteId: siteId!, assetId: assetId!, fileName, mime: imageMimeSchema.parse(mime), buffer: Buffer.concat(chunks) };
