@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:e2e": "node --import tsx scripts/renderGeneratedFixtures.tsx && playwright test",
-    "worker": "tsx worker/index.ts"
+    "worker": "tsx worker/index.ts",
+    "check:deployment": "node --env-file-if-exists=.env.local --import tsx scripts/checkDeploymentEnv.ts"
   },
   "dependencies": {
     "busboy": "1.6.0",
