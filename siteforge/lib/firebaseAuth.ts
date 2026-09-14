@@ -1,8 +1,8 @@
 'use client';
 
 import { getAuth } from 'firebase/auth';
-import { firebaseApp } from './firebase';
+import { getFirebaseApp } from './firebase';
 
 export function getFirebaseAuth() {
-  return getAuth(firebaseApp);
+  return getAuth(getFirebaseApp());
 }

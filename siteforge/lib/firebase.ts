@@ -9,7 +9,17 @@ const firebaseConfig = {
   appId:             process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Prevent re-initialising on hot-reload
-export const firebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+export function isFirebaseConfigured() {
+  return [firebaseConfig.apiKey, firebaseConfig.authDomain, firebaseConfig.projectId, firebaseConfig.appId]
+    .every(value => Boolean(value && !value.startsWith('your_')));
+}
 
-export const db = getFirestore(firebaseApp);
+export function getFirebaseApp() {
+  if (!isFirebaseConfigured()) throw new Error('FIREBASE_CLIENT_NOT_CONFIGURED');
+  return getApps().length ? getApp() : initializeApp(firebaseConfig);
+}
+
+// Initialize on use, so missing staging settings cannot crash module imports.
+export function getClientFirestore() {
+  return getFirestore(getFirebaseApp());
+}

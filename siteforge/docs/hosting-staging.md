@@ -35,3 +35,9 @@ No deployment configuration is supplied for a nonexistent worker, and this check
 ## Preview setup lock
 
 `proxy.ts` matches all routes. In Vercel preview environments, it returns HTTP 503 with no-store and noindex headers until `SITEFORGE_PREVIEW_UNLOCKED=true`. This blocks the incomplete application during setup, including APIs and assets. It is a setup lock, not user authentication. Do not unlock until Vercel Authentication is verified and staging configuration is complete. Local development and production retain their normal routing; server APIs still verify sessions independently. The `/studio` route is now also covered by the existing session-cookie navigation hint.
+
+## Follow-up verification
+
+The user supplied a Vercel dashboard screenshot showing deployment Ready and environment Production, despite the tool creation response claiming preview. Do not assume the preview-only setup lock is active on that deployment. The user subsequently reported enabling Vercel Authentication for All Deployments. The connector still returns 403 for project metadata, so that protection setting cannot yet be independently verified. Do not send another deployment through the same opaque tool until its target behavior and project access are resolved.
+
+A local SDK reproduction confirmed that eagerly initializing Firestore and Auth without client configuration throws `invalid-argument` and `auth/invalid-api-key`. Client initialization is now lazy; the public page can render without configuration and the login page disables sign-in with a visible availability message. This fixes a reproduced failure path, but the live error cause remains unverified without logs. Firebase client configuration must be present at build time, followed by a rebuild, to enable authentication.

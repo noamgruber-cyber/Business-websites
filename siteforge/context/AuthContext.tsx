@@ -2,12 +2,14 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
+import { isFirebaseConfigured } from '@/lib/firebase';
 import { getFirebaseAuth } from '@/lib/firebaseAuth';
 import { signInWithGoogle as authSignInWithGoogle, signOut as authSignOut } from '@/lib/auth';
 
 type AuthContextValue = {
   user: User | null;
   loading: boolean;
+  authAvailable: boolean;
   reauthenticationRequired: boolean;
   signInWithGoogle: () => Promise<User>;
   signOut: () => Promise<void>;
@@ -16,11 +18,13 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const authAvailable = isFirebaseConfigured();
   const [user, setUser]       = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(authAvailable);
   const [reauthenticationRequired, setReauthenticationRequired] = useState(false);
 
   useEffect(() => {
+    if (!authAvailable) return;
     let active = true;
     const unsubscribe = onAuthStateChanged(getFirebaseAuth(), async (u) => {
       if (!u) {
@@ -57,9 +61,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       active = false;
       unsubscribe();
     };
-  }, []);
+  }, [authAvailable]);
 
   const signInWithGoogle = async () => {
+    if (!authAvailable) throw new Error('FIREBASE_CLIENT_NOT_CONFIGURED');
     const signedInUser = await authSignInWithGoogle();
     await ensureServerSession(signedInUser, true);
     setUser(signedInUser);
@@ -77,7 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, reauthenticationRequired, signInWithGoogle, signOut }}
+      value={{ user, loading, authAvailable, reauthenticationRequired, signInWithGoogle, signOut }}
     >
       {children}
     </AuthContext.Provider>
