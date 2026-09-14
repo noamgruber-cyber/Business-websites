@@ -37,7 +37,7 @@ import PhotographyStudioTemplate from '@/app/templates/photography/PhotographySt
 
 import { BusinessData } from '@/lib/types';
 
-type Props = { params: { slug: string } };
+type Props = { params: Promise<{ slug: string }> };
 
 // ── Load business: Firestore first, fallback to mock for demo slugs ──────────
 async function loadBusiness(slug: string): Promise<BusinessData | null | 'offline'> {
@@ -57,7 +57,8 @@ async function loadBusiness(slug: string): Promise<BusinessData | null | 'offlin
 
 // ── SEO Metadata ──────────────────────────────────────────────────────────────
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const business = await loadBusiness(params.slug);
+  const { slug } = await params;
+  const business = await loadBusiness(slug);
   if (!business || business === 'offline') return { title: 'Business Not Found — SiteForge' };
 
   const desc = `${business.tagline} ${business.description}`.slice(0, 155);
@@ -74,10 +75,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default async function BusinessPage({ params }: Props) {
-  const business = await loadBusiness(params.slug);
+  const { slug } = await params;
+  const business = await loadBusiness(slug);
 
   // Fire-and-forget analytics — don't slow down page load
-  recordView(params.slug).catch(() => {});
+  recordView(slug).catch(() => {});
 
   // Firestore offline / unavailable
   if (business === 'offline') {

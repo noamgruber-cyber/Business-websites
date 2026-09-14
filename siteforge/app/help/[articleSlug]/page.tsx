@@ -3,14 +3,15 @@ import { notFound } from 'next/navigation';
 import { getArticleBySlug, helpArticles, getRelatedArticles, CATEGORY_META } from '@/lib/helpArticles';
 import HelpArticleClient from './HelpArticleClient';
 
-type Props = { params: { articleSlug: string } };
+type Props = { params: Promise<{ articleSlug: string }> };
 
 export function generateStaticParams() {
   return helpArticles.map((a) => ({ articleSlug: a.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const article = getArticleBySlug(params.articleSlug);
+  const { articleSlug } = await params;
+  const article = getArticleBySlug(articleSlug);
   if (!article) return { title: 'Article Not Found — SiteForge Help' };
   return {
     title: `${article.title} — SiteForge Help Center`,
@@ -18,8 +19,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default function HelpArticlePage({ params }: Props) {
-  const article = getArticleBySlug(params.articleSlug);
+export default async function HelpArticlePage({ params }: Props) {
+  const { articleSlug } = await params;
+  const article = getArticleBySlug(articleSlug);
   if (!article) notFound();
 
   const related = getRelatedArticles(article.slug, article.category, 3);

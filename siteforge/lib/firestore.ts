@@ -11,20 +11,20 @@ import {
   orderBy,
   limit,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { getClientFirestore } from './firebase';
 import { BusinessData } from './types';
 
 const COL = 'businesses';
 
 // ── Save (create or overwrite) a business ────────────────────────────────────
 export async function saveBusiness(data: BusinessData): Promise<void> {
-  const ref = doc(db, COL, data.slug);
+  const ref = doc(getClientFirestore(), COL, data.slug);
   await setDoc(ref, { ...data, savedAt: new Date().toISOString() });
 }
 
 // ── Fetch a single business by slug ──────────────────────────────────────────
 export async function getBusiness(slug: string): Promise<BusinessData | null> {
-  const ref  = doc(db, COL, slug);
+  const ref  = doc(getClientFirestore(), COL, slug);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
   return snap.data() as BusinessData;
@@ -32,7 +32,7 @@ export async function getBusiness(slug: string): Promise<BusinessData | null> {
 
 // ── Fetch all businesses (max 50, newest first) ───────────────────────────────
 export async function getAllBusinesses(): Promise<BusinessData[]> {
-  const q    = query(collection(db, COL), orderBy('createdAt', 'desc'), limit(50));
+  const q    = query(collection(getClientFirestore(), COL), orderBy('createdAt', 'desc'), limit(50));
   const snap = await getDocs(q);
   return snap.docs.map((d) => d.data() as BusinessData);
 }
@@ -42,7 +42,7 @@ export async function updateBusiness(
   slug: string,
   updates: Partial<BusinessData>,
 ): Promise<void> {
-  const ref = doc(db, COL, slug);
+  const ref = doc(getClientFirestore(), COL, slug);
   await updateDoc(ref, { ...updates, savedAt: new Date().toISOString() });
 }
 
@@ -51,7 +51,7 @@ export async function checkSlugAvailable(
   slug: string,
   excludeId?: string,
 ): Promise<boolean> {
-  const ref  = doc(db, COL, slug);
+  const ref  = doc(getClientFirestore(), COL, slug);
   const snap = await getDoc(ref);
   if (!snap.exists()) return true;
   // If the existing doc belongs to the same business being edited, it's still available
@@ -61,13 +61,13 @@ export async function checkSlugAvailable(
 
 // ── Delete a business by slug ─────────────────────────────────────────────────
 export async function deleteBusiness(slug: string): Promise<void> {
-  const ref = doc(db, COL, slug);
+  const ref = doc(getClientFirestore(), COL, slug);
   await deleteDoc(ref);
 }
 
 // ── Fetch all businesses owned by a user ─────────────────────────────────────
 export async function getBusinessesByUser(uid: string): Promise<BusinessData[]> {
-  const q    = query(collection(db, COL), where('ownerUid', '==', uid), orderBy('createdAt', 'desc'));
+  const q    = query(collection(getClientFirestore(), COL), where('ownerUid', '==', uid), orderBy('createdAt', 'desc'));
   const snap = await getDocs(q);
   return snap.docs.map((d) => d.data() as BusinessData);
 }

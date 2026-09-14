@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import type { ReactElement } from 'react';
 import { BusinessData, OpeningHours } from '@/lib/types';
 import TrackedLink from '@/components/TrackedLink';
 
@@ -20,7 +21,7 @@ const DAY_LABELS: { key: keyof OpeningHours; label: string }[] = [
   { key: 'saturday',  label: 'Saturday' },
 ];
 
-function fmtHours(value: string): JSX.Element {
+function fmtHours(value: string): ReactElement {
   if (!value || value === 'closed') {
     return <span style={{ color: '#ef4444' }}>Closed</span>;
   }

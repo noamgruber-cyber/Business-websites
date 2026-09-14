@@ -8,7 +8,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { t } from '@/lib/translations';
 
 function LoginForm() {
-  const { user, loading, signInWithGoogle } = useAuth();
+  const { user, loading, authAvailable, signInWithGoogle } = useAuth();
   const router       = useRouter();
   const searchParams = useSearchParams();
   const redirect     = searchParams.get('redirect') || '/dashboard';
@@ -65,6 +65,11 @@ function LoginForm() {
 
         {/* Card */}
         <div className="bg-white/[0.04] border border-white/10 rounded-3xl p-8 backdrop-blur-sm">
+          {!authAvailable && (
+            <p role="status" className="mb-5 text-sm text-white/70 text-center">
+              {lang === 'he' ? 'ההתחברות עדיין אינה זמינה. ניתן לחזור לעמוד הבית.' : 'Sign-in is not available yet. You can return to the home page.'}
+            </p>
+          )}
           {error && (
             <div className="mb-5 p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm text-center">
               {error}
@@ -73,7 +78,7 @@ function LoginForm() {
 
           <button
             onClick={handleGoogleSignIn}
-            disabled={signingIn}
+            disabled={signingIn || !authAvailable}
             className="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-2xl bg-white hover:bg-gray-50 text-gray-900 font-semibold text-base transition-all duration-200 shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {signingIn ? (

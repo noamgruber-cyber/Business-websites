@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/context/LanguageContext";
 import { t } from "@/lib/translations";
@@ -51,15 +51,17 @@ function Field({
   type?: string; placeholder?: string; error?: string; required?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const prevErr = useRef<string | undefined>();
+  const prevErr = useRef<string | undefined>(undefined);
 
   // Shake on new error
-  if (error && error !== prevErr.current && ref.current) {
-    ref.current.classList.remove("shake");
-    void ref.current.offsetWidth;
-    ref.current.classList.add("shake");
-  }
-  prevErr.current = error;
+  useEffect(() => {
+    if (error && error !== prevErr.current && ref.current) {
+      ref.current.classList.remove("shake");
+      void ref.current.offsetWidth;
+      ref.current.classList.add("shake");
+    }
+    prevErr.current = error;
+  }, [error]);
 
   return (
     <div ref={ref} className="flex flex-col gap-1.5">

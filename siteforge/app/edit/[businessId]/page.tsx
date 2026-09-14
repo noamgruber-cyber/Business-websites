@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -16,7 +16,7 @@ import Step5_Publish from '@/components/editor/Step5_Publish';
 import LivePreview from '@/components/editor/LivePreview';
 
 type Props = {
-  params: { businessId: string };
+  params: Promise<{ businessId: string }>;
 };
 
 const STEP_COMPONENTS = [
@@ -27,7 +27,7 @@ const STEP_COMPONENTS = [
 ];
 
 export default function EditPage({ params }: Props) {
-  const { businessId } = params;
+  const { businessId } = use(params);
   const router = useRouter();
   const { businessData, currentStep, setStep } = useEditorStore();
   const { lang } = useLanguage();

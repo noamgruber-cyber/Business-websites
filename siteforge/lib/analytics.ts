@@ -5,7 +5,7 @@ import {
   increment,
   serverTimestamp,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { getClientFirestore } from './firebase';
 
 export type AnalyticsData = {
   totalViews: number;
@@ -27,7 +27,7 @@ function todayKey(): string {
 
 /** Record a page view for a slug — fire-and-forget safe */
 export async function recordView(slug: string): Promise<void> {
-  const ref  = doc(db, COL, slug);
+  const ref  = doc(getClientFirestore(), COL, slug);
   const date = todayKey();
   await setDoc(
     ref,
@@ -45,7 +45,7 @@ export async function recordClick(
   slug: string,
   type: 'whatsapp' | 'instagram' | 'phone' | 'facebook',
 ): Promise<void> {
-  const ref = doc(db, COL, slug);
+  const ref = doc(getClientFirestore(), COL, slug);
   await setDoc(
     ref,
     { [`totalClicks.${type}`]: increment(1) },
@@ -55,7 +55,7 @@ export async function recordClick(
 
 /** Fetch analytics document — returns null if not found */
 export async function getAnalytics(slug: string): Promise<AnalyticsData | null> {
-  const ref  = doc(db, COL, slug);
+  const ref  = doc(getClientFirestore(), COL, slug);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
 

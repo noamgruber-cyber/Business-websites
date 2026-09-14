@@ -4,7 +4,7 @@ import Link from "next/link";
 import { blogPosts, getPostBySlug, getRelatedPosts, CATEGORY_COLORS } from "@/lib/blogPosts";
 import BlogPostClient from "./BlogPostClient";
 
-type Props = { params: { slug: string } };
+type Props = { params: Promise<{ slug: string }> };
 
 // ── Static params ────────────────────────────────────────────────────────────
 export function generateStaticParams() {
@@ -13,7 +13,8 @@ export function generateStaticParams() {
 
 // ── SEO metadata ─────────────────────────────────────────────────────────────
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const post = getPostBySlug(params.slug);
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
   if (!post) return { title: "Post Not Found — SiteForge Blog" };
   return {
     title: `${post.title} | SiteForge Blog`,
@@ -34,8 +35,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // ── Page ─────────────────────────────────────────────────────────────────────
-export default function BlogPostPage({ params }: Props) {
-  const post = getPostBySlug(params.slug);
+export default async function BlogPostPage({ params }: Props) {
+  const { slug } = await params;
+  const post = getPostBySlug(slug);
   if (!post) notFound();
 
   const related = getRelatedPosts(post.slug, post.category, 2);
