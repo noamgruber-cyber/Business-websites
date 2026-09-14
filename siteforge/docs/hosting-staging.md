@@ -5,7 +5,7 @@ Implementation branch: `codex/automatic-website-implementation` (draft PR #2).
 
 ## Current account inspection
 
-Vercel is connected, but its team listing returned no teams. A dashboard project link or team ID is needed to inspect the destination. Render workspace `tea-d6o7u0n5gffc73epf5h0` was selected in the conversation; its services listing returned no service entries. No service was created, plan purchased or deployment started.
+Vercel created preview deployment `dpl_8LTJ4oUdzaKYTMEz51efnUvkXGw1` for the new `siteforge-staging` project on 2026-09-14. The returned team is `smp2rvyqtz-6835` (`team_tdXqe8NTkXcbwrm7Dgdysgiw`). Deployment URL: https://siteforge-staging-36lcm6l9o-smp2rvyqtz-6835.vercel.app . Inspector: https://vercel.com/smp2rvyqtz-6835/siteforge-staging/8LTJ4oUdzaKYTMEz51efnUvkXGw1 . The creation response reported INITIALIZING. Subsequent metadata reads returned 403 for both the team slug and ID, and the team listing remained empty. Build success, account ownership and platform access protection therefore remain unverified. Render workspace `tea-d6o7u0n5gffc73epf5h0` was selected in the conversation; its services listing returned no service entries. No Render service was created or plan purchased. The Vercel upload contains repository files from `siteforge/`, excluding environment files and TypeScript build caches; it is not a Git integration deployment.
 
 ## Check configuration before integration
 
@@ -31,3 +31,7 @@ Passing means configuration shape is valid. It does not authenticate credentials
 5. Verify storage, provider access, owner isolation and failure recovery in staging before enabling the flow. Hosting connections alone do not supply Firebase, Cloudinary or OpenAI runtime credentials.
 
 No deployment configuration is supplied for a nonexistent worker, and this checklist does not authorize production publication or paid resource creation.
+
+## Preview setup lock
+
+`proxy.ts` matches all routes. In Vercel preview environments, it returns HTTP 503 with no-store and noindex headers until `SITEFORGE_PREVIEW_UNLOCKED=true`. This blocks the incomplete application during setup, including APIs and assets. It is a setup lock, not user authentication. Do not unlock until Vercel Authentication is verified and staging configuration is complete. Local development and production retain their normal routing; server APIs still verify sessions independently. The `/studio` route is now also covered by the existing session-cookie navigation hint.
