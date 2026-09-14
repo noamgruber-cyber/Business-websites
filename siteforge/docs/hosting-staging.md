@@ -41,3 +41,20 @@ No deployment configuration is supplied for a nonexistent worker, and this check
 The user supplied a Vercel dashboard screenshot showing deployment Ready and environment Production, despite the tool creation response claiming preview. Do not assume the preview-only setup lock is active on that deployment. The user subsequently reported enabling Vercel Authentication for All Deployments. The connector still returns 403 for project metadata, so that protection setting cannot yet be independently verified. Do not send another deployment through the same opaque tool until its target behavior and project access are resolved.
 
 A local SDK reproduction confirmed that eagerly initializing Firestore and Auth without client configuration throws `invalid-argument` and `auth/invalid-api-key`. Client initialization is now lazy; the public page can render without configuration and the login page disables sign-in with a visible availability message. This fixes a reproduced failure path, but the live error cause remains unverified without logs. Firebase client configuration must be present at build time, followed by a rebuild, to enable authentication.
+
+## Generation admission (implementation branch)
+
+`POST /api/sites/{id}/generate` now atomically stores a queued job, its exact
+validated intake/revision, the site's active-job pointer, the idempotent response,
+and daily owner/platform quota increments. Admission performs no model calls.
+Defaults remain three admissions per owner and twenty globally per UTC day.
+Disabled AI generation or an unset model rejects new admission. Existing matching
+requests replay without consuming another admission. Ownership, revision, contact
+completeness, image readiness/ownership and image rights are checked before writes.
+The route remains behind the existing session, same-origin and automation gates.
+
+Six Firestore Emulator tests cover simultaneous duplicate/distinct requests,
+owner and global quotas, UTC rollover, invalid configuration/input and image
+ownership/readiness. CI runs these with Java 21. A worker and live provider setup
+are still required before enabling generation; this change alone does not build
+or publish a website.
